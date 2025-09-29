@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Productos - HairBiz Pro</title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         * {
             margin: 0;
@@ -264,31 +264,31 @@
             .header {
                 padding: 1rem;
             }
-            
+
             .header-title {
                 font-size: 1.2rem;
             }
-            
+
             .new-product-btn {
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
             }
-            
+
             .main-content {
                 padding: 1rem;
             }
-            
+
             .products-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            
+
             .products-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
             }
-            
+
             .products-actions {
                 width: 100%;
                 justify-content: space-between;
@@ -299,7 +299,7 @@
             .product-card {
                 padding: 1rem;
             }
-            
+
             .search-container {
                 padding: 0.75rem;
             }
@@ -410,12 +410,12 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Firebase -->
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -441,8 +441,10 @@
         window.deleteDoc = deleteDoc;
         window.query = query;
         window.orderBy = orderBy;
+        window.where = where;
+        window.getDoc = getDoc;
     </script>
-    
+
     <script>
         // Función para volver al dashboard
         function goBack() {
@@ -453,11 +455,11 @@
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const productCards = document.querySelectorAll('.product-card');
-            
+
             productCards.forEach(card => {
                 const productName = card.querySelector('.product-name').textContent.toLowerCase();
                 const productCategory = card.querySelector('.product-category').textContent.toLowerCase();
-                
+
                 if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
                     card.style.display = 'block';
                 } else {
@@ -471,7 +473,7 @@
             btn.addEventListener('click', function() {
                 const card = this.closest('.product-card');
                 const badge = card.querySelector('.product-badge');
-                
+
                 if (badge.textContent === 'Activo') {
                     badge.textContent = 'Inactivo';
                     badge.style.background = '#dc3545';
@@ -483,7 +485,7 @@
                     this.textContent = 'Desactivar';
                     card.style.opacity = '1';
                 }
-                
+
                 updateProductCount();
             });
         });
@@ -493,7 +495,7 @@
             const activeProducts = document.querySelectorAll('.product-badge').length;
             const activeBadges = Array.from(document.querySelectorAll('.product-badge')).filter(badge => badge.textContent === 'Activo').length;
             const inactiveBadges = activeProducts - activeBadges;
-            
+
             document.querySelector('.products-title').textContent = `Productos (${activeProducts})`;
             document.querySelectorAll('.products-count')[0].textContent = `${activeBadges} Activos`;
             document.querySelectorAll('.products-count')[1].textContent = `${inactiveBadges} Inactivos`;
@@ -547,7 +549,15 @@
                             <select class="form-select" id="categoria">
                                 <option value="">Ej: Shampoos, Mascarillas, etc.</option>
                                 <option value="Shampoos">Shampoos</option>
+                                <option value="Pre-poo">Pre-poo</option>
+                                <option value="Leave-in">Leave-in</option>
+                                <option value="Cremas">Cremas</option>
+                                <option value="Definidores">Definidores</option>
+                                <option value="Laceadores">Laceadores</option>
+                                <option value="Goteros">Goteros</option>
                                 <option value="Mascarillas">Mascarillas</option>
+                                <option value="Ampollas">Ampollas</option>
+                                <option value="Jaleas">Jaleas</option>
                                 <option value="Serums">Serums</option>
                                 <option value="Kits">Kits</option>
                                 <option value="Tratamientos">Tratamientos</option>
@@ -581,6 +591,94 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" onclick="agregarProducto()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
                         Agregar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Producto -->
+    <div class="modal fade" id="editarProductoModal" tabindex="-1" aria-labelledby="editarProductoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                    <h5 class="modal-title" id="editarProductoModalLabel">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarProductoForm">
+                        <input type="hidden" id="editProductoId">
+                        <!-- Nombre del Producto -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="editNombreProducto" class="form-label">
+                                    Nombre del Producto <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="editNombreProducto" placeholder="Ej: Shampoo Anti-Caspa" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editPrecioBase" class="form-label">
+                                    Precio de Venta <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="editPrecioBase" placeholder="0" min="0" step="1000" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editPrecioCompra" class="form-label">
+                                    Precio de Compra <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="editPrecioCompra" placeholder="0" min="0" step="1000" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label for="editCategoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="editCategoria">
+                                <option value="">Ej: Shampoos, Mascarillas, etc.</option>
+                                <option value="Shampoos">Shampoos</option>
+                                <option value="Mascarillas">Mascarillas</option>
+                                <option value="Serums">Serums</option>
+                                <option value="Kits">Kits</option>
+                                <option value="Tratamientos">Tratamientos</option>
+                                <option value="Acondicionadores">Acondicionadores</option>
+                            </select>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label for="editDescripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="editDescripcion" rows="3" placeholder="Describe las características del producto..."></textarea>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Status</label>
+                            <select class="form-select" id="editStatus">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <!-- Notas Adicionales -->
+                        <div class="mb-3">
+                            <label for="editNotasAdicionales" class="form-label">Notas Adicionales</label>
+                            <textarea class="form-control" id="editNotasAdicionales" rows="2" placeholder="Instrucciones especiales, ingredientes destacados, etc."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="actualizarProducto()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; color: white;">
+                        Actualizar Producto
                     </button>
                 </div>
             </div>
@@ -660,16 +758,16 @@
                 querySnapshot.forEach((doc) => {
                     const producto = doc.data();
                     const productoId = doc.id;
-                    
+
                     const nuevaCard = document.createElement('div');
                     nuevaCard.className = 'product-card';
                     nuevaCard.dataset.id = productoId;
-                    
+
                     const badgeClass = producto.activo ? 'Activo' : 'Inactivo';
                     const badgeStyle = producto.activo ? 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'background: #dc3545';
                     const cardOpacity = producto.activo ? '1' : '0.6';
                     const buttonText = producto.activo ? 'Desactivar' : 'Activar';
-                    
+
                     nuevaCard.innerHTML = `
                         <div class="product-badge" style="${badgeStyle}">${badgeClass}</div>
                         <div class="product-name">${producto.nombre}</div>
@@ -706,7 +804,7 @@
                 const newActivo = !currentActivo;
                 const newStatus = newActivo ? 'activo' : 'inactivo';
                 const productoRef = doc(db, 'productos', productoId);
-                
+
                 await updateDoc(productoRef, {
                     status: newStatus,
                     activo: newActivo
@@ -733,9 +831,103 @@
             }
         }
 
-        // Función para editar producto (placeholder)
-        function editarProducto(productoId) {
-            alert('Función de edición en desarrollo. ID: ' + productoId);
+        // Función para editar producto
+        async function editarProducto(productoId) {
+            try {
+                console.log('Cargando producto para editar:', productoId);
+
+                // Obtener el producto de Firebase usando el ID del documento
+                const productoRef = doc(db, 'productos', productoId);
+                const productoDoc = await getDoc(productoRef);
+
+                if (!productoDoc.exists()) {
+                    alert('Producto no encontrado');
+                    return;
+                }
+
+                const producto = productoDoc.data();
+
+                // Cargar datos en el modal de edición
+                document.getElementById('editProductoId').value = productoId;
+                document.getElementById('editNombreProducto').value = producto.nombre || '';
+                document.getElementById('editPrecioBase').value = producto.precio || '';
+                document.getElementById('editPrecioCompra').value = producto.precioCompra || '';
+                document.getElementById('editCategoria').value = producto.categoria || '';
+                document.getElementById('editDescripcion').value = producto.descripcion || '';
+                document.getElementById('editStatus').value = producto.status || 'activo';
+                document.getElementById('editNotasAdicionales').value = producto.notas || '';
+
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(document.getElementById('editarProductoModal'));
+                modal.show();
+
+            } catch (error) {
+                console.error('Error al cargar producto para editar:', error);
+                alert('Error al cargar el producto: ' + error.message);
+            }
+        }
+
+        // Función para actualizar producto
+        async function actualizarProducto() {
+            try {
+                const productoId = document.getElementById('editProductoId').value;
+                const nombre = document.getElementById('editNombreProducto').value.trim();
+                const precio = document.getElementById('editPrecioBase').value;
+                const precioCompra = document.getElementById('editPrecioCompra').value;
+                const categoria = document.getElementById('editCategoria').value || 'Sin categoría';
+                const descripcion = document.getElementById('editDescripcion').value.trim();
+                const notas = document.getElementById('editNotasAdicionales').value.trim();
+                const status = document.getElementById('editStatus').value;
+
+                // Validación básica
+                if (!nombre || !precio || !precioCompra) {
+                    alert('Por favor completa todos los campos obligatorios');
+                    return;
+                }
+
+                if (parseFloat(precio) <= 0 || parseFloat(precioCompra) <= 0) {
+                    alert('Los precios deben ser mayores a 0');
+                    return;
+                }
+
+                // Calcular margen de ganancia
+                const margenGanancia = ((parseFloat(precio) - parseFloat(precioCompra)) / parseFloat(precio) * 100).toFixed(2);
+
+                // Actualizar el producto usando el ID del documento
+                const productoRef = doc(db, 'productos', productoId);
+
+                const productoActualizado = {
+                    nombre: nombre,
+                    precio: parseFloat(precio),
+                    precioCompra: parseFloat(precioCompra),
+                    categoria: categoria,
+                    descripcion: descripcion,
+                    notas: notas,
+                    status: status,
+                    activo: status === 'activo',
+                    margenGanancia: parseFloat(margenGanancia),
+                    fechaActualizacion: new Date().toISOString()
+                };
+
+                await updateDoc(productoRef, productoActualizado);
+
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editarProductoModal'));
+                modal.hide();
+
+                // Limpiar formulario
+                document.getElementById('editarProductoForm').reset();
+
+                // Recargar productos
+                await cargarProductos();
+
+                alert('Producto actualizado exitosamente');
+                console.log('Producto actualizado:', productoActualizado);
+
+            } catch (error) {
+                console.error('Error al actualizar producto:', error);
+                alert('Error al actualizar el producto: ' + error.message);
+            }
         }
 
         // Cargar productos al cargar la página
