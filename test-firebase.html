@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Firebase Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .data-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Test de Conexión Firebase</h1>
+        
+        <div id="connectionStatus" class="status info">
+            Iniciando conexión con Firebase...
+        </div>
+
+        <div class="data-section">
+            <h3>Acciones de Prueba</h3>
+            <button onclick="testConnection()">🔗 Probar Conexión</button>
+            <button onclick="createTestData()">📝 Crear Datos de Prueba</button>
+            <button onclick="loadPedidos()">📦 Cargar Pedidos</button>
+            <button onclick="loadProductos()">🛍️ Cargar Productos</button>
+            <button onclick="loadClientes()">👥 Cargar Clientes</button>
+        </div>
+
+        <div id="results" class="data-section">
+            <h3>Resultados</h3>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVUmZ7t3xC3_Hz5mGM4IG3PcFUi6utxDQ",
+            authDomain: "hairbiz-6262f.firebaseapp.com",
+            projectId: "hairbiz-6262f",
+            storageBucket: "hairbiz-6262f.firebasestorage.app",
+            messagingSenderId: "1061804186635",
+            appId: "1:1061804186635:web:7b904658deda5852577b0e"
+        };
+
+        let app, db;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            
+            document.getElementById('connectionStatus').innerHTML = '✅ Firebase inicializado correctamente';
+            document.getElementById('connectionStatus').className = 'status success';
+            
+            // Hacer funciones globales
+            window.db = db;
+            window.collection = collection;
+            window.addDoc = addDoc;
+            window.getDocs = getDocs;
+            window.doc = doc;
+            window.setDoc = setDoc;
+            
+        } catch (error) {
+            document.getElementById('connectionStatus').innerHTML = `❌ Error al inicializar Firebase: ${error.message}`;
+            document.getElementById('connectionStatus').className = 'status error';
+            console.error('Error Firebase:', error);
+        }
+
+        // Función para probar conexión
+        window.testConnection = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>🔄 Probando conexión...</p>';
+            
+            try {
+                const testCollection = collection(db, 'test');
+                const snapshot = await getDocs(testCollection);
+                output.innerHTML = `<p class="success">✅ Conexión exitosa! Colección 'test' tiene ${snapshot.size} documentos</p>`;
+            } catch (error) {
+                output.innerHTML = `<p class="error">❌ Error de conexión: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        };
+
+        // Función para crear datos de prueba
+        window.createTestData = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>🔄 Creando datos de prueba...</p>';
+            
+            try {
+                // Crear producto de prueba
+                const productoRef = await addDoc(collection(db, 'productos'), {
+                    nombre: 'Shampoo Premium',
+                    precio: 25000,
+                    costo: 15000,
+                    categoria: 'Cuidado Capilar',
+                    stock: 50,
+                    fechaCreacion: new Date()
+                });
+
+                // Crear pedido de prueba
+                const pedidoRef = await addDoc(collection(db, 'pedidos'), {
+                    cliente: {
+                        nombre: 'María González',
+                        telefono: '3001234567'
+                    },
+                    productos: [{
+                        id: productoRef.id,
+                        nombre: 'Shampoo Premium',
+                        precio: 25000,
+                        cantidad: 2
+                    }],
+                    resumen: {
+                        subtotal: 50000,
+                        descuento: 0,
+                        total: 50000
+                    },
+                    fechaCreacion: new Date(),
+                    estado: 'completado'
+                });
+
+                output.innerHTML = `
+                    <p class="success">✅ Datos de prueba creados exitosamente!</p>
+                    <p>📦 Producto ID: ${productoRef.id}</p>
+                    <p>🛒 Pedido ID: ${pedidoRef.id}</p>
+                `;
+            } catch (error) {
+                output.innerHTML = `<p class="error">❌ Error creando datos: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        };
+
+        // Función para cargar pedidos
+        window.loadPedidos = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>🔄 Cargando pedidos...</p>';
+            
+            try {
+                const snapshot = await getDocs(collection(db, 'pedidos'));
+                const pedidos = [];
+                snapshot.forEach((doc) => {
+                    pedidos.push({ id: doc.id, ...doc.data() });
+                });
+
+                output.innerHTML = `
+                    <p class="success">✅ Pedidos cargados: ${pedidos.length}</p>
+                    <pre>${JSON.stringify(pedidos, null, 2)}</pre>
+                `;
+            } catch (error) {
+                output.innerHTML = `<p class="error">❌ Error cargando pedidos: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        };
+
+        // Función para cargar productos
+        window.loadProductos = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>🔄 Cargando productos...</p>';
+            
+            try {
+                const snapshot = await getDocs(collection(db, 'productos'));
+                const productos = [];
+                snapshot.forEach((doc) => {
+                    productos.push({ id: doc.id, ...doc.data() });
+                });
+
+                output.innerHTML = `
+                    <p class="success">✅ Productos cargados: ${productos.length}</p>
+                    <pre>${JSON.stringify(productos, null, 2)}</pre>
+                `;
+            } catch (error) {
+                output.innerHTML = `<p class="error">❌ Error cargando productos: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        };
+
+        // Función para cargar clientes (desde pedidos)
+        window.loadClientes = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>🔄 Cargando clientes...</p>';
+            
+            try {
+                const snapshot = await getDocs(collection(db, 'pedidos'));
+                const clientesMap = new Map();
+
+                snapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    if (pedido.cliente && pedido.cliente.nombre) {
+                        const clienteKey = pedido.cliente.nombre.toLowerCase();
+                        if (!clientesMap.has(clienteKey)) {
+                            clientesMap.set(clienteKey, {
+                                nombre: pedido.cliente.nombre,
+                                telefono: pedido.cliente.telefono || '',
+                                pedidos: 1,
+                                totalGastado: pedido.resumen?.total || 0
+                            });
+                        } else {
+                            const cliente = clientesMap.get(clienteKey);
+                            cliente.pedidos++;
+                            cliente.totalGastado += pedido.resumen?.total || 0;
+                        }
+                    }
+                });
+
+                const clientes = Array.from(clientesMap.values());
+                output.innerHTML = `
+                    <p class="success">✅ Clientes encontrados: ${clientes.length}</p>
+                    <pre>${JSON.stringify(clientes, null, 2)}</pre>
+                `;
+            } catch (error) {
+                output.innerHTML = `<p class="error">❌ Error cargando clientes: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

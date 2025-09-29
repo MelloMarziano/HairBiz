@@ -470,68 +470,14 @@
                 Productos Más Vendidos
             </h2>
 
-            <div class="products-table">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Producto</th>
-                            <th>Unidades Vendidas</th>
-                            <th>Ingresos</th>
-                            <th>Margen</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="product-rank">1</div>
-                            </td>
-                            <td>
-                                <div class="product-name">Kit Tratamiento Completo</div>
-                                <small class="text-muted">15 unidades vendidas</small>
-                            </td>
-                            <td>15</td>
-                            <td class="product-sales">$900,000</td>
-                            <td><span class="badge bg-success">Ingresos</span></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-rank">2</div>
-                            </td>
-                            <td>
-                                <div class="product-name">Shampoo Reparador</div>
-                                <small class="text-muted">12 unidades vendidas</small>
-                            </td>
-                            <td>12</td>
-                            <td class="product-sales">$540,000</td>
-                            <td><span class="badge bg-success">Ingresos</span></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-rank">3</div>
-                            </td>
-                            <td>
-                                <div class="product-name">Mascarilla Hidratante</div>
-                                <small class="text-muted">10 unidades vendidas</small>
-                            </td>
-                            <td>10</td>
-                            <td class="product-sales">$350,000</td>
-                            <td><span class="badge bg-success">Ingresos</span></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-rank">4</div>
-                            </td>
-                            <td>
-                                <div class="product-name">Serum Nocturno</div>
-                                <small class="text-muted">8 unidades vendidas</small>
-                            </td>
-                            <td>8</td>
-                            <td class="product-sales">$420,000</td>
-                            <td><span class="badge bg-success">Ingresos</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="products-table" id="productosTable">
+                <!-- Los productos más vendidos se cargarán dinámicamente desde Firebase -->
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando productos más vendidos...</p>
+                </div>
             </div>
         </div>
 
@@ -566,6 +512,334 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Importar Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVUmZ7t3xC3_Hz5mGM4IG3PcFUi6utxDQ",
+            authDomain: "hairbiz-6262f.firebaseapp.com",
+            projectId: "hairbiz-6262f",
+            storageBucket: "hairbiz-6262f.firebasestorage.app",
+            messagingSenderId: "1061804186635",
+            appId: "1:1061804186635:web:7b904658deda5852577b0e"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Hacer funciones disponibles globalmente
+        window.db = db;
+        window.collection = collection;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.where = where;
+
+        // Cargar datos al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarDatosReportes();
+        });
+
+        // Función para cargar datos de reportes desde Firebase
+        async function cargarDatosReportes() {
+            try {
+                // Mostrar indicador de carga
+                mostrarCargando();
+
+                // Obtener pedidos
+                const pedidosSnapshot = await getDocs(collection(db, 'pedidos'));
+                const pedidos = [];
+                pedidosSnapshot.forEach((doc) => {
+                    pedidos.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Obtener productos
+                const productosSnapshot = await getDocs(collection(db, 'productos'));
+                const productos = [];
+                productosSnapshot.forEach((doc) => {
+                    productos.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Calcular métricas
+                calcularMetricas(pedidos, productos);
+                
+                // Ocultar indicador de carga
+                ocultarCargando();
+
+            } catch (error) {
+                console.error('Error al cargar datos de reportes: ', error);
+                ocultarCargando();
+                mostrarError();
+            }
+        }
+
+        // Función para calcular métricas
+        function calcularMetricas(pedidos, productos) {
+            let ventasTotales = 0;
+            let costoTotal = 0;
+            let totalPedidos = pedidos.length;
+            let clientesUnicos = new Set();
+
+            // Calcular ventas totales y costos
+            pedidos.forEach(pedido => {
+                if (pedido.resumen && pedido.resumen.total) {
+                    ventasTotales += parseFloat(pedido.resumen.total) || 0;
+                }
+                
+                // Agregar cliente único
+                if (pedido.cliente && pedido.cliente.nombre) {
+                    clientesUnicos.add(pedido.cliente.nombre);
+                }
+
+                // Calcular costo basado en productos
+                if (pedido.productos) {
+                    pedido.productos.forEach(item => {
+                        const producto = productos.find(p => p.id === item.id || p.nombre === item.nombre);
+                        if (producto && producto.costo) {
+                            costoTotal += (parseFloat(producto.costo) || 0) * (item.cantidad || 1);
+                        }
+                    });
+                }
+            });
+
+            const gananciaNeta = ventasTotales - costoTotal;
+            const clientesNuevos = clientesUnicos.size;
+
+            // Actualizar métricas en la interfaz
+            actualizarMetricasUI(ventasTotales, gananciaNeta, totalPedidos, clientesNuevos);
+            
+            // Calcular análisis de rendimiento
+            calcularAnalisisRendimiento(ventasTotales, costoTotal, gananciaNeta);
+            
+            // Cargar productos más vendidos
+            cargarProductosMasVendidos(pedidos, productos);
+        }
+
+        // Función para actualizar métricas en la UI
+        function actualizarMetricasUI(ventas, ganancia, pedidos, clientes) {
+            // Restaurar el HTML original de las métricas
+            const metricsContainer = document.querySelector('.metrics-container');
+            if (metricsContainer) {
+                metricsContainer.innerHTML = `
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="metric-card primary">
+                                <i class="fas fa-dollar-sign metric-icon"></i>
+                                <div class="metric-value">$${ventas.toLocaleString()}</div>
+                                <div class="metric-label">Ventas Totales</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="metric-card success">
+                                <i class="fas fa-chart-line metric-icon"></i>
+                                <div class="metric-value">$${ganancia.toLocaleString()}</div>
+                                <div class="metric-label">Ganancia Neta</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="metric-card warning">
+                                <i class="fas fa-shopping-cart metric-icon"></i>
+                                <div class="metric-value">${pedidos}</div>
+                                <div class="metric-label">Pedidos</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="metric-card info">
+                                <i class="fas fa-user-plus metric-icon"></i>
+                                <div class="metric-value">${clientes}</div>
+                                <div class="metric-label">Clientes Nuevos</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para calcular análisis de rendimiento
+        function calcularAnalisisRendimiento(ventas, costos, ganancia) {
+            const margenGanancia = ventas > 0 ? (ganancia / ventas) * 100 : 0;
+            const roi = costos > 0 ? (ganancia / costos) * 100 : 0;
+
+            // Actualizar barras de progreso
+            const progressBars = document.querySelectorAll('.progress-fill');
+            if (progressBars[0]) {
+                progressBars[0].style.width = `${Math.min(margenGanancia, 100)}%`;
+                const progressText = progressBars[0].parentElement.nextElementSibling;
+                if (progressText) {
+                    progressText.querySelector('span').textContent = `${margenGanancia.toFixed(1)}%`;
+                }
+            }
+            
+            if (progressBars[1]) {
+                progressBars[1].style.width = `${Math.min(roi, 100)}%`;
+                const progressText = progressBars[1].parentElement.nextElementSibling;
+                if (progressText) {
+                    progressText.querySelector('span').textContent = `${roi.toFixed(1)}%`;
+                }
+            }
+
+            // Actualizar resumen financiero
+            actualizarResumenFinanciero(ventas, costos, ganancia);
+        }
+
+        // Función para actualizar resumen financiero
+        function actualizarResumenFinanciero(ventas, costos, ganancia) {
+            const summaryValues = document.querySelectorAll('.summary-value');
+            if (summaryValues[0]) summaryValues[0].textContent = `$${costos.toLocaleString()}`;
+            if (summaryValues[1]) summaryValues[1].textContent = `$${ventas.toLocaleString()}`;
+            if (summaryValues[2]) summaryValues[2].textContent = `$${ganancia.toLocaleString()}`;
+        }
+
+        // Función para cargar productos más vendidos
+        function cargarProductosMasVendidos(pedidos, productos) {
+            try {
+                // Contar productos vendidos
+                const productosVendidos = {};
+                
+                pedidos.forEach(pedido => {
+                    if (pedido.productos && Array.isArray(pedido.productos)) {
+                        pedido.productos.forEach(item => {
+                            const productoId = item.id || item.productoId;
+                            const cantidad = parseInt(item.cantidad) || 1;
+                            
+                            if (productosVendidos[productoId]) {
+                                productosVendidos[productoId].cantidad += cantidad;
+                                productosVendidos[productoId].ingresos += (item.precio || 0) * cantidad;
+                            } else {
+                                productosVendidos[productoId] = {
+                                    cantidad: cantidad,
+                                    ingresos: (item.precio || 0) * cantidad,
+                                    nombre: item.nombre || 'Producto sin nombre'
+                                };
+                            }
+                        });
+                    }
+                });
+
+                // Convertir a array y ordenar por cantidad vendida
+                const productosArray = Object.entries(productosVendidos).map(([id, data]) => ({
+                    id,
+                    ...data
+                })).sort((a, b) => b.cantidad - a.cantidad);
+
+                // Mostrar solo los top 5
+                const topProductos = productosArray.slice(0, 5);
+                
+                mostrarProductosMasVendidos(topProductos);
+            } catch (error) {
+                console.error('Error al cargar productos más vendidos:', error);
+                mostrarErrorProductos();
+            }
+        }
+
+        // Función para mostrar productos más vendidos en la tabla
+        function mostrarProductosMasVendidos(productos) {
+            const productosTable = document.getElementById('productosTable');
+            
+            if (productos.length === 0) {
+                productosTable.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-box-open text-muted fa-3x mb-3"></i>
+                        <p class="text-muted">No hay productos vendidos aún</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let tableHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th>Unidades Vendidas</th>
+                            <th>Ingresos</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            productos.forEach((producto, index) => {
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <div class="product-rank">${index + 1}</div>
+                        </td>
+                        <td>
+                            <div class="product-name">${producto.nombre}</div>
+                            <small class="text-muted">${producto.cantidad} unidades vendidas</small>
+                        </td>
+                        <td>${producto.cantidad}</td>
+                        <td class="product-sales">$${producto.ingresos.toLocaleString()}</td>
+                        <td><span class="badge bg-success">Activo</span></td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            productosTable.innerHTML = tableHTML;
+        }
+
+        // Función para mostrar error en productos
+        function mostrarErrorProductos() {
+            const productosTable = document.getElementById('productosTable');
+            productosTable.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-exclamation-triangle text-warning fa-2x mb-3"></i>
+                    <p class="text-muted">Error al cargar productos más vendidos</p>
+                </div>
+            `;
+        }
+
+        // Función para mostrar indicador de carga
+        function mostrarCargando() {
+            const metricsContainer = document.querySelector('.metrics-container');
+            if (metricsContainer) {
+                metricsContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Cargando datos de reportes...</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para ocultar indicador de carga
+        function ocultarCargando() {
+            // La función calcularMetricas ya actualiza el contenido
+        }
+
+        // Función para mostrar error
+        function mostrarError() {
+            const metricsContainer = document.querySelector('.metrics-container');
+            if (metricsContainer) {
+                metricsContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                        <p class="text-muted">Error al cargar los datos de reportes</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Reintentar</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.cargarDatosReportes = cargarDatosReportes;
+    </script>
+    
     <script>
         // Funcionalidad para selector de período
         document.querySelectorAll('.period-btn').forEach(btn => {
@@ -573,8 +847,9 @@
                 document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Aquí se actualizarían los datos según el período seleccionado
+                // Recargar datos según el período seleccionado
                 console.log('Período seleccionado:', this.textContent);
+                cargarDatosReportes();
             });
         });
 

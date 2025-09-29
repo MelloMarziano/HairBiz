@@ -301,6 +301,12 @@
                 <div class="col">
                     <h1 class="page-title">Clientes</h1>
                 </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" onclick="mostrarModalNuevoCliente()">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Cliente
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -311,25 +317,25 @@
             <div class="row">
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="metric-card">
-                        <div class="metric-value metric-primary">4</div>
+                        <div class="metric-value metric-primary" id="totalClientes">0</div>
                         <div class="metric-label">Total Clientes</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="metric-card">
-                        <div class="metric-value metric-warning">1</div>
+                        <div class="metric-value metric-warning" id="clientesVIP">0</div>
                         <div class="metric-label">Clientes VIP</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="metric-card">
-                        <div class="metric-value metric-success">$155,000</div>
-                        <div class="metric-label">Por Cobrar</div>
+                        <div class="metric-value metric-success" id="totalGastado">$0</div>
+                        <div class="metric-label">Total Gastado</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="metric-card">
-                        <div class="metric-value metric-info">$542,750</div>
+                        <div class="metric-value metric-info" id="promedioCliente">$0</div>
                         <div class="metric-label">Promedio por Cliente</div>
                     </div>
                 </div>
@@ -351,186 +357,48 @@
         <div class="clients-container">
             <h2 class="section-title">
                 <i class="fas fa-users"></i>
-                Lista de Clientes (<span id="clientCount">4</span>)
+                Lista de Clientes (<span id="clientCount">0</span>)
             </h2>
 
-            <div id="clientsList">
-                <!-- Cliente 1: María González -->
-                <div class="client-card" data-client="maria gonzalez">
-                    <div class="client-header">
-                        <div>
-                            <div class="client-name">María González</div>
-                            <span class="client-status status-active">Activa</span>
-                        </div>
+            <div class="row" id="clientsContainer">
+                <!-- Los clientes se cargarán dinámicamente desde Firebase -->
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
                     </div>
-                    
-                    <div class="client-contact">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>+57 300 123 4567</span>
-                        </div>
-                    </div>
-
-                    <div class="client-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">8</div>
-                            <div class="stat-label">Pedidos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">$456,000</div>
-                            <div class="stat-label">Total Comprado</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">12</div>
-                            <div class="stat-label">Productos</div>
-                        </div>
-                    </div>
-
-                    <div class="client-notes">
-                        <strong>Notas:</strong> Cliente frecuente, prefiere productos para cabello graso.
-                        <br><strong>Último pedido:</strong> 1/4/2024
-                    </div>
-
-                    <div class="mt-3">
-                        <button class="action-btn me-2">
-                            <i class="fas fa-plus"></i>
-                            Nuevo Pedido
-                        </button>
-                    </div>
+                    <p class="mt-3 text-muted">Cargando clientes...</p>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Cliente 2: Ana Rodríguez -->
-                <div class="client-card" data-client="ana rodriguez">
-                    <div class="client-header">
-                        <div>
-                            <div class="client-name">Ana Rodríguez</div>
-                            <span class="client-status status-active">Activa</span>
-                            <span class="client-status status-vip ms-2">Debe $150,000</span>
-                        </div>
-                    </div>
-                    
-                    <div class="client-contact">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>+57 301 987 6543</span>
-                        </div>
-                    </div>
-
-                    <div class="client-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">12</div>
-                            <div class="stat-label">Pedidos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">$680,000</div>
-                            <div class="stat-label">Total Comprado</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">18</div>
-                            <div class="stat-label">Productos</div>
-                        </div>
-                    </div>
-
-                    <div class="client-notes">
-                        <strong>Notas:</strong> Siempre pide tratamientos hidratantes.
-                        <br><strong>Último pedido:</strong> 9/8/2024
-                    </div>
-
-                    <div class="mt-3">
-                        <button class="action-btn me-2">
-                            <i class="fas fa-plus"></i>
-                            Nuevo Pedido
-                        </button>
-                    </div>
+    <!-- Modal para Nuevo Cliente -->
+    <div class="modal fade" id="nuevoClienteModal" tabindex="-1" aria-labelledby="nuevoClienteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoClienteModalLabel">Nuevo Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <!-- Cliente 3: Carmen López -->
-                <div class="client-card" data-client="carmen lopez">
-                    <div class="client-header">
-                        <div>
-                            <div class="client-name">Carmen López</div>
-                            <span class="client-status status-active">Activa</span>
-                            <span class="client-status status-vip ms-2">Debe $18,000</span>
+                <div class="modal-body">
+                    <form id="nuevoClienteForm">
+                        <div class="mb-3">
+                            <label for="nombreCliente" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombreCliente" required>
                         </div>
-                    </div>
-                    
-                    <div class="client-contact">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>+57 302 456 7890</span>
+                        <div class="mb-3">
+                            <label for="telefonoCliente" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="telefonoCliente" required>
                         </div>
-                    </div>
-
-                    <div class="client-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">6</div>
-                            <div class="stat-label">Pedidos</div>
+                        <div class="mb-3">
+                            <label for="notasCliente" class="form-label">Notas (opcional)</label>
+                            <textarea class="form-control" id="notasCliente" rows="3" placeholder="Preferencias, observaciones, etc."></textarea>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value">$345,000</div>
-                            <div class="stat-label">Total Comprado</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">9</div>
-                            <div class="stat-label">Productos</div>
-                        </div>
-                    </div>
-
-                    <div class="client-notes">
-                        <strong>Notas:</strong> Prefiere productos orgánicos y naturales.
-                        <br><strong>Último pedido:</strong> 15/7/2024
-                    </div>
-
-                    <div class="mt-3">
-                        <button class="action-btn me-2">
-                            <i class="fas fa-plus"></i>
-                            Nuevo Pedido
-                        </button>
-                    </div>
+                    </form>
                 </div>
-
-                <!-- Cliente 4: Sofía Martínez -->
-                <div class="client-card" data-client="sofia martinez">
-                    <div class="client-header">
-                        <div>
-                            <div class="client-name">Sofía Martínez</div>
-                            <span class="client-status status-vip">VIP</span>
-                        </div>
-                    </div>
-                    
-                    <div class="client-contact">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>+57 305 111 2222</span>
-                        </div>
-                    </div>
-
-                    <div class="client-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">15</div>
-                            <div class="stat-label">Pedidos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">$890,000</div>
-                            <div class="stat-label">Total Comprado</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">25</div>
-                            <div class="stat-label">Productos</div>
-                        </div>
-                    </div>
-
-                    <div class="client-notes">
-                        <strong>Notas:</strong> Cliente VIP, siempre compra productos premium.
-                        <br><strong>Último pedido:</strong> 28/8/2024
-                    </div>
-
-                    <div class="mt-3">
-                        <button class="action-btn me-2">
-                            <i class="fas fa-plus"></i>
-                            Nuevo Pedido
-                        </button>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarNuevoCliente()">Guardar Cliente</button>
                 </div>
             </div>
         </div>
@@ -538,6 +406,55 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Función para mostrar el modal de nuevo cliente
+        function mostrarModalNuevoCliente() {
+            const modal = new bootstrap.Modal(document.getElementById('nuevoClienteModal'));
+            modal.show();
+        }
+
+        // Función para guardar nuevo cliente
+        async function guardarNuevoCliente() {
+            const nombre = document.getElementById('nombreCliente').value.trim();
+            const telefono = document.getElementById('telefonoCliente').value.trim();
+            const notas = document.getElementById('notasCliente').value.trim();
+
+            if (!nombre || !telefono) {
+                alert('Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            try {
+                // Crear el objeto cliente
+                const nuevoCliente = {
+                    nombre: nombre,
+                    telefono: telefono,
+                    notas: notas,
+                    fechaRegistro: new Date().toISOString(),
+                    totalPedidos: 0,
+                    totalGastado: 0,
+                    ultimoPedido: null,
+                    estado: 'activo'
+                };
+
+                // Guardar en Firebase
+                const docRef = await addDoc(collection(db, 'clientes'), nuevoCliente);
+                console.log('Cliente guardado con ID: ', docRef.id);
+
+                // Cerrar modal y limpiar formulario
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoClienteModal'));
+                modal.hide();
+                document.getElementById('nuevoClienteForm').reset();
+
+                // Recargar la lista de clientes
+                cargarClientes();
+
+                alert('Cliente guardado exitosamente');
+            } catch (error) {
+                console.error('Error al guardar cliente: ', error);
+                alert('Error al guardar el cliente. Inténtalo de nuevo.');
+            }
+        }
+
         // Funcionalidad de búsqueda
         document.getElementById('searchInput').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
@@ -568,6 +485,217 @@
                 const clientName = this.closest('.client-card').querySelector('.client-name').textContent;
                 alert(`Crear nuevo pedido para ${clientName}`);
             });
+        });
+    </script>
+
+    <!-- Firebase -->
+    <script type="module">
+        // Importar Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, limit } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVUmZ7t3xC3_Hz5mGM4IG3PcFUi6utxDQ",
+            authDomain: "hairbiz-6262f.firebaseapp.com",
+            projectId: "hairbiz-6262f",
+            storageBucket: "hairbiz-6262f.firebasestorage.app",
+            messagingSenderId: "1061804186635",
+            appId: "1:1061804186635:web:7b904658deda5852577b0e"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase functions globally available
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.where = where;
+
+        // Función para cargar clientes desde Firebase
+        async function cargarClientes() {
+            try {
+                console.log('Cargando clientes desde Firebase...');
+                const clientesContainer = document.getElementById('clientsContainer');
+                
+                // Mostrar loading
+                clientesContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Cargando clientes...</p>
+                    </div>
+                `;
+
+                // Obtener clientes únicos de los pedidos
+                const pedidosSnapshot = await getDocs(collection(db, 'pedidos'));
+                const clientesMap = new Map();
+
+                pedidosSnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    if (pedido.cliente && pedido.cliente.nombre) {
+                        const clienteKey = pedido.cliente.nombre.toLowerCase();
+                        if (!clientesMap.has(clienteKey)) {
+                            clientesMap.set(clienteKey, {
+                                nombre: pedido.cliente.nombre,
+                                telefono: pedido.cliente.telefono || '',
+                                pedidos: 1,
+                                ultimoPedido: pedido.fechaCreacion?.toDate() || new Date(),
+                                totalGastado: pedido.resumen?.total || 0
+                            });
+                        } else {
+                            const cliente = clientesMap.get(clienteKey);
+                            cliente.pedidos++;
+                            cliente.totalGastado += pedido.resumen?.total || 0;
+                            if (pedido.fechaCreacion?.toDate() > cliente.ultimoPedido) {
+                                cliente.ultimoPedido = pedido.fechaCreacion.toDate();
+                            }
+                        }
+                    }
+                });
+
+                // Convertir a array y ordenar por último pedido
+                const clientes = Array.from(clientesMap.values())
+                    .sort((a, b) => b.ultimoPedido - a.ultimoPedido);
+
+                // Renderizar clientes
+                if (clientes.length === 0) {
+                    clientesContainer.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay clientes registrados</h5>
+                            <p class="text-muted">Los clientes aparecerán automáticamente cuando realices pedidos.</p>
+                        </div>
+                    `;
+                } else {
+                    clientesContainer.innerHTML = clientes.map(cliente => `
+                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                            <div class="client-card">
+                                <div class="client-header">
+                                    <div class="client-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="client-info">
+                                        <h5 class="client-name">${cliente.nombre}</h5>
+                                        <span class="client-status">Cliente activo</span>
+                                    </div>
+                                </div>
+                                <div class="client-details">
+                                    ${cliente.telefono ? `
+                                        <div class="contact-item">
+                                            <i class="fas fa-phone"></i>
+                                            <span>${cliente.telefono}</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <span class="stat-value">${cliente.pedidos}</span>
+                                            <span class="stat-label">Pedidos</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">$${cliente.totalGastado.toLocaleString()}</span>
+                                            <span class="stat-label">Total gastado</span>
+                                        </div>
+                                    </div>
+                                    <div class="client-actions">
+                                        <button class="action-btn" onclick="crearNuevoPedido('${cliente.nombre}', '${cliente.telefono}')">
+                                            <i class="fas fa-plus"></i>
+                                            Nuevo Pedido
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Actualizar contador
+                document.getElementById('clientCount').textContent = clientes.length;
+
+                // Actualizar métricas
+                actualizarMetricasClientes(clientes);
+
+                console.log(`Cargados ${clientes.length} clientes desde Firebase`);
+
+            } catch (error) {
+                console.error('Error al cargar clientes:', error);
+                document.getElementById('clientsContainer').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h5 class="text-warning">Error al cargar clientes</h5>
+                        <p class="text-muted">Por favor, intenta recargar la página.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para actualizar métricas de clientes
+        function actualizarMetricasClientes(clientes) {
+            const totalClientes = clientes.length;
+            let totalGastado = 0;
+            let clientesVIP = 0;
+
+            clientes.forEach(cliente => {
+                totalGastado += cliente.totalGastado;
+                // Considerar VIP si ha gastado más de $500,000 o tiene más de 5 pedidos
+                if (cliente.totalGastado > 500000 || cliente.pedidos > 5) {
+                    clientesVIP++;
+                }
+            });
+
+            const promedioCliente = totalClientes > 0 ? totalGastado / totalClientes : 0;
+
+            // Actualizar elementos del DOM
+            document.getElementById('totalClientes').textContent = totalClientes;
+            document.getElementById('clientesVIP').textContent = clientesVIP;
+            document.getElementById('totalGastado').textContent = `$${totalGastado.toLocaleString()}`;
+            document.getElementById('promedioCliente').textContent = `$${Math.round(promedioCliente).toLocaleString()}`;
+        }
+
+        // Función para crear nuevo pedido con datos del cliente
+        window.crearNuevoPedido = function(nombre, telefono) {
+            // Guardar datos del cliente en localStorage para usar en index.html
+            localStorage.setItem('clienteSeleccionado', JSON.stringify({
+                nombre: nombre,
+                telefono: telefono
+            }));
+            
+            // Redirigir a index.html con el modal abierto
+            window.location.href = 'index.html?openModal=nuevoPedido';
+        };
+
+        // Cargar clientes al cargar la página
+        document.addEventListener('DOMContentLoaded', cargarClientes);
+
+        // Actualizar la funcionalidad de búsqueda para trabajar con datos dinámicos
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const clientCards = document.querySelectorAll('.client-card');
+            let visibleCount = 0;
+
+            clientCards.forEach(card => {
+                const clientName = card.querySelector('.client-name').textContent.toLowerCase();
+                const phoneElement = card.querySelector('.contact-item span');
+                const clientPhone = phoneElement ? phoneElement.textContent.toLowerCase() : '';
+
+                if (clientName.includes(searchTerm) || clientPhone.includes(searchTerm)) {
+                    card.closest('.col-lg-4').style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.closest('.col-lg-4').style.display = 'none';
+                }
+            });
+
+            document.getElementById('clientCount').textContent = visibleCount;
         });
     </script>
 </body>
