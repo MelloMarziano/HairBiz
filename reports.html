@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Análisis - HairBiz Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #a855f7;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+            --light-text: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark-text);
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin: 0;
+        }
+
+        .metrics-container {
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-card.primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .metric-card.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .metric-card.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .metric-card.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .metric-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .analysis-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .analysis-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .analysis-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-success { background: var(--success-color); }
+        .progress-warning { background: var(--warning-color); }
+        .progress-primary { background: var(--primary-color); }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: var(--light-text);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .products-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table th {
+            background: var(--light-bg);
+            border: none;
+            font-weight: 600;
+            color: var(--dark-text);
+            padding: 1rem;
+        }
+
+        .table td {
+            border: none;
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .product-rank {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .product-sales {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .financial-summary {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            color: var(--light-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .summary-primary { color: var(--primary-color); }
+        .summary-success { color: var(--success-color); }
+        .summary-warning { color: var(--warning-color); }
+
+        .period-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .period-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--light-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .metric-card {
+                margin-bottom: 1rem;
+            }
+            
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <a href="index.html" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver
+                    </a>
+                </div>
+                <div class="col">
+                    <h1 class="page-title">Reportes y Análisis</h1>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Selector de Período -->
+        <div class="period-selector">
+            <button class="period-btn active">Este Mes</button>
+            <button class="period-btn">Últimos 3 Meses</button>
+            <button class="period-btn">Este Año</button>
+            <button class="period-btn">Personalizado</button>
+        </div>
+
+        <!-- Métricas Principales -->
+        <div class="metrics-container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="metric-card primary">
+                        <i class="fas fa-dollar-sign metric-icon"></i>
+                        <div class="metric-value">$1,840,000</div>
+                        <div class="metric-label">Ventas Totales</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="metric-card success">
+                        <i class="fas fa-chart-line metric-icon"></i>
+                        <div class="metric-value">$950,000</div>
+                        <div class="metric-label">Ganancia Neta</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="metric-card warning">
+                        <i class="fas fa-shopping-cart metric-icon"></i>
+                        <div class="metric-value">28</div>
+                        <div class="metric-label">Pedidos</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="metric-card info">
+                        <i class="fas fa-user-plus metric-icon"></i>
+                        <div class="metric-value">6</div>
+                        <div class="metric-label">Clientes Nuevos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis de Rendimiento -->
+        <div class="analysis-container">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                Análisis de Rendimiento
+            </h2>
+
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="analysis-title">
+                        <i class="fas fa-trending-up text-success"></i>
+                        Margen de Ganancia
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-success" style="width: 51.6%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>51.6%</span>
+                        <span>vs mes anterior</span>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="analysis-title">
+                        <i class="fas fa-box text-warning"></i>
+                        ROI (Retorno de Inversión)
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-warning" style="width: 106.7%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>106.7%</span>
+                        <span>Excelente rendimiento</span>
+                    </div>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="analysis-title">
+                        <i class="fas fa-users text-primary"></i>
+                        Ticket Promedio
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-primary" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>$65,714</span>
+                        <span>Por cliente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos Más Vendidos -->
+        <div class="analysis-container">
+            <h2 class="section-title">
+                <i class="fas fa-trophy"></i>
+                Productos Más Vendidos
+            </h2>
+
+            <div class="products-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th>Unidades Vendidas</th>
+                            <th>Ingresos</th>
+                            <th>Margen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="product-rank">1</div>
+                            </td>
+                            <td>
+                                <div class="product-name">Kit Tratamiento Completo</div>
+                                <small class="text-muted">15 unidades vendidas</small>
+                            </td>
+                            <td>15</td>
+                            <td class="product-sales">$900,000</td>
+                            <td><span class="badge bg-success">Ingresos</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-rank">2</div>
+                            </td>
+                            <td>
+                                <div class="product-name">Shampoo Reparador</div>
+                                <small class="text-muted">12 unidades vendidas</small>
+                            </td>
+                            <td>12</td>
+                            <td class="product-sales">$540,000</td>
+                            <td><span class="badge bg-success">Ingresos</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-rank">3</div>
+                            </td>
+                            <td>
+                                <div class="product-name">Mascarilla Hidratante</div>
+                                <small class="text-muted">10 unidades vendidas</small>
+                            </td>
+                            <td>10</td>
+                            <td class="product-sales">$350,000</td>
+                            <td><span class="badge bg-success">Ingresos</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-rank">4</div>
+                            </td>
+                            <td>
+                                <div class="product-name">Serum Nocturno</div>
+                                <small class="text-muted">8 unidades vendidas</small>
+                            </td>
+                            <td>8</td>
+                            <td class="product-sales">$420,000</td>
+                            <td><span class="badge bg-success">Ingresos</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Resumen Financiero del Mes -->
+        <div class="financial-summary">
+            <h2 class="section-title">
+                <i class="fas fa-calculator"></i>
+                Resumen Financiero del Mes
+            </h2>
+
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value summary-warning">$890,000</div>
+                    <div class="summary-label">Inversión Total</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value summary-primary">$1,840,000</div>
+                    <div class="summary-label">Ingresos Totales</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value summary-success">$950,000</div>
+                    <div class="summary-label">Ganancia Neta</div>
+                </div>
+            </div>
+
+            <div class="mt-3 text-center">
+                <small class="text-muted">
+                    Por cada peso invertido, obtienes <strong>$1.07</strong> en ganancia
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Funcionalidad para selector de período
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Aquí se actualizarían los datos según el período seleccionado
+                console.log('Período seleccionado:', this.textContent);
+            });
+        });
+
+        // Animación de las barras de progreso al cargar la página
+        window.addEventListener('load', function() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+
+        // Funcionalidad para exportar reportes
+        document.querySelector('.btn-outline-secondary').addEventListener('click', function() {
+            alert('Funcionalidad de exportación - Próximamente disponible');
+        });
+    </script>
+</body>
+</html>

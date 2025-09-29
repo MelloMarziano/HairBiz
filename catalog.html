@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - HairBiz Pro</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .new-product-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .new-product-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 1.5rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        /* Products Section */
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .products-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .products-count {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .products-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-category {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-description {
+            color: #777;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-notes {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-deactivate {
+            flex: 1;
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e9ecef;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-deactivate:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-edit {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn-edit:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .header-title {
+                font-size: 1.2rem;
+            }
+            
+            .new-product-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .products-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .products-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-card {
+                padding: 1rem;
+            }
+            
+            .search-container {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </button>
+        <h1 class="header-title">Catálogo de Productos</h1>
+        <button class="new-product-btn" data-bs-toggle="modal" data-bs-target="#nuevoProductoModal">
+            Nuevo
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Buscar productos por nombre o categoría..." id="searchInput">
+        </div>
+
+        <!-- Products Section -->
+        <div class="products-header">
+            <div>
+                <h2 class="products-title">Productos (4)</h2>
+            </div>
+            <div class="products-actions">
+                <span class="products-count">4 Activos</span>
+                <span class="products-count">0 Inactivos</span>
+                <button class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid">
+            <!-- Shampoo Reparador Premium -->
+            <div class="product-card">
+                <div class="product-badge">Activo</div>
+                <div class="product-name">Shampoo Reparador Premium</div>
+                <div class="product-category">Shampoo</div>
+                <div class="product-description">Fórmula especializada para cabello dañado y quebradizo.</div>
+                <div class="product-price">$45,000</div>
+                <div class="product-notes">Notas: Incluye tratamiento de proteína</div>
+                <div class="product-actions">
+                    <button class="btn-deactivate">Desactivar</button>
+                    <button class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kit Tratamiento Completo -->
+            <div class="product-card">
+                <div class="product-badge">Activo</div>
+                <div class="product-name">Kit Tratamiento Completo</div>
+                <div class="product-category">Kits</div>
+                <div class="product-description">Set completo: Shampoo + Mascarilla + Serum</div>
+                <div class="product-price">$120,000</div>
+                <div class="product-notes">Notas: Para tratamientos intensivos</div>
+                <div class="product-actions">
+                    <button class="btn-deactivate">Desactivar</button>
+                    <button class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mascarilla Hidratante -->
+            <div class="product-card">
+                <div class="product-badge">Activo</div>
+                <div class="product-name">Mascarilla Hidratante</div>
+                <div class="product-category">Mascarillas</div>
+                <div class="product-description">Mascarilla nutritiva con aceites naturales</div>
+                <div class="product-price">$35,000</div>
+                <div class="product-notes">Notas: Para cabello seco</div>
+                <div class="product-actions">
+                    <button class="btn-deactivate">Desactivar</button>
+                    <button class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Serum Reparador Nocturno -->
+            <div class="product-card">
+                <div class="product-badge">Activo</div>
+                <div class="product-name">Serum Reparador Nocturno</div>
+                <div class="product-category">Serums</div>
+                <div class="product-description">Tratamiento intensivo para usar durante la noche</div>
+                <div class="product-price">$28,000</div>
+                <div class="product-notes">Notas: Sin enjuague</div>
+                <div class="product-actions">
+                    <button class="btn-deactivate">Desactivar</button>
+                    <button class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVUmZ7t3xC3_Hz5mGM4IG3PcFUi6utxDQ",
+            authDomain: "hairbiz-6262f.firebaseapp.com",
+            projectId: "hairbiz-6262f",
+            storageBucket: "hairbiz-6262f.firebasestorage.app",
+            messagingSenderId: "1061804186635",
+            appId: "1:1061804186635:web:7b904658deda5852577b0e"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase functions globally available
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.orderBy = orderBy;
+    </script>
+    
+    <script>
+        // Función para volver al dashboard
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Función de búsqueda
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const productCards = document.querySelectorAll('.product-card');
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector('.product-name').textContent.toLowerCase();
+                const productCategory = card.querySelector('.product-category').textContent.toLowerCase();
+                
+                if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Funciones para los botones de productos
+        document.querySelectorAll('.btn-deactivate').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.product-card');
+                const badge = card.querySelector('.product-badge');
+                
+                if (badge.textContent === 'Activo') {
+                    badge.textContent = 'Inactivo';
+                    badge.style.background = '#dc3545';
+                    this.textContent = 'Activar';
+                    card.style.opacity = '0.6';
+                } else {
+                    badge.textContent = 'Activo';
+                    badge.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    this.textContent = 'Desactivar';
+                    card.style.opacity = '1';
+                }
+                
+                updateProductCount();
+            });
+        });
+
+        // Función para actualizar el contador de productos
+        function updateProductCount() {
+            const activeProducts = document.querySelectorAll('.product-badge').length;
+            const activeBadges = Array.from(document.querySelectorAll('.product-badge')).filter(badge => badge.textContent === 'Activo').length;
+            const inactiveBadges = activeProducts - activeBadges;
+            
+            document.querySelector('.products-title').textContent = `Productos (${activeProducts})`;
+            document.querySelectorAll('.products-count')[0].textContent = `${activeBadges} Activos`;
+            document.querySelectorAll('.products-count')[1].textContent = `${inactiveBadges} Inactivos`;
+        }
+    </script>
+
+    <!-- Modal Agregar Nuevo Producto -->
+    <div class="modal fade" id="nuevoProductoModal" tabindex="-1" aria-labelledby="nuevoProductoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="modal-title" id="nuevoProductoModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Agregar Nuevo Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="nuevoProductoForm">
+                        <!-- Nombre del Producto -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="nombreProducto" class="form-label">
+                                    Nombre del Producto <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="nombreProducto" placeholder="Ej: Shampoo Anti-Caspa" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="precioBase" class="form-label">
+                                    Precio de Venta <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="precioBase" placeholder="0" min="0" step="1000" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="precioCompra" class="form-label">
+                                    Precio de Compra <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="precioCompra" placeholder="0" min="0" step="1000" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="categoria">
+                                <option value="">Ej: Shampoos, Mascarillas, etc.</option>
+                                <option value="Shampoos">Shampoos</option>
+                                <option value="Mascarillas">Mascarillas</option>
+                                <option value="Serums">Serums</option>
+                                <option value="Kits">Kits</option>
+                                <option value="Tratamientos">Tratamientos</option>
+                                <option value="Acondicionadores">Acondicionadores</option>
+                            </select>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" rows="3" placeholder="Describe las características del producto..."></textarea>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <!-- Notas Adicionales -->
+                        <div class="mb-3">
+                            <label for="notasAdicionales" class="form-label">Notas Adicionales</label>
+                            <textarea class="form-control" id="notasAdicionales" rows="2" placeholder="Instrucciones especiales, ingredientes destacados, etc."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="agregarProducto()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        Agregar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para agregar nuevo producto
+        async function agregarProducto() {
+            const nombre = document.getElementById('nombreProducto').value.trim();
+            const precio = document.getElementById('precioBase').value;
+            const precioCompra = document.getElementById('precioCompra').value;
+            const categoria = document.getElementById('categoria').value || 'Sin categoría';
+            const descripcion = document.getElementById('descripcion').value.trim();
+            const notas = document.getElementById('notasAdicionales').value.trim();
+            const status = document.getElementById('status').value;
+
+            // Validación básica
+            if (!nombre || !precio || !precioCompra) {
+                alert('Por favor, completa los campos obligatorios (Nombre, Precio de Venta y Precio de Compra).');
+                return;
+            }
+
+            // Validar que el precio de venta sea mayor al precio de compra
+            if (parseInt(precio) <= parseInt(precioCompra)) {
+                alert('El precio de venta debe ser mayor al precio de compra para tener ganancia.');
+                return;
+            }
+
+            try {
+                // Calcular margen de ganancia
+                const margenGanancia = ((parseInt(precio) - parseInt(precioCompra)) / parseInt(precio) * 100).toFixed(2);
+
+                // Crear producto en Firebase
+                const producto = {
+                    nombre: nombre,
+                    precio: parseInt(precio),
+                    precioCompra: parseInt(precioCompra),
+                    margenGanancia: parseFloat(margenGanancia),
+                    categoria: categoria,
+                    descripcion: descripcion || 'Sin descripción',
+                    notas: notas || 'Sin notas adicionales',
+                    status: status,
+                    activo: status === 'activo',
+                    fechaCreacion: new Date()
+                };
+
+                await addDoc(collection(db, 'productos'), producto);
+
+                // Limpiar formulario
+                document.getElementById('nuevoProductoForm').reset();
+
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoProductoModal'));
+                modal.hide();
+
+                // Recargar productos
+                await cargarProductos();
+
+                // Mostrar mensaje de éxito
+                alert(`¡Producto agregado exitosamente! Margen de ganancia: ${margenGanancia}%`);
+            } catch (error) {
+                console.error('Error al agregar producto:', error);
+                alert('Error al agregar el producto. Inténtalo de nuevo.');
+            }
+        }
+
+        // Función para cargar productos desde Firebase
+        async function cargarProductos() {
+            try {
+                const productosGrid = document.querySelector('.products-grid');
+                productosGrid.innerHTML = '';
+
+                const q = query(collection(db, 'productos'), orderBy('fechaCreacion', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                querySnapshot.forEach((doc) => {
+                    const producto = doc.data();
+                    const productoId = doc.id;
+                    
+                    const nuevaCard = document.createElement('div');
+                    nuevaCard.className = 'product-card';
+                    nuevaCard.dataset.id = productoId;
+                    
+                    const badgeClass = producto.activo ? 'Activo' : 'Inactivo';
+                    const badgeStyle = producto.activo ? 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'background: #dc3545';
+                    const cardOpacity = producto.activo ? '1' : '0.6';
+                    const buttonText = producto.activo ? 'Desactivar' : 'Activar';
+                    
+                    nuevaCard.innerHTML = `
+                        <div class="product-badge" style="${badgeStyle}">${badgeClass}</div>
+                        <div class="product-name">${producto.nombre}</div>
+                        <div class="product-category">${producto.categoria}</div>
+                        <div class="product-description">${producto.descripcion}</div>
+                        <div class="product-price">Venta: $${producto.precio.toLocaleString()}</div>
+                        <div class="product-price" style="font-size: 0.9rem; color: #666;">Compra: $${producto.precioCompra ? producto.precioCompra.toLocaleString() : 'N/A'}</div>
+                        <div class="product-price" style="font-size: 0.9rem; color: #28a745; font-weight: bold;">Margen: ${producto.margenGanancia ? producto.margenGanancia.toFixed(1) : 'N/A'}%</div>
+                        <div class="product-notes">Notas: ${producto.notas}</div>
+                        <div class="product-actions">
+                            <button class="btn-deactivate" onclick="toggleProductStatus('${productoId}', ${producto.activo})">${buttonText}</button>
+                            <button class="btn-edit" onclick="editarProducto('${productoId}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="eliminarProducto('${productoId}')" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; margin-left: 5px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    nuevaCard.style.opacity = cardOpacity;
+                    productosGrid.appendChild(nuevaCard);
+                });
+
+                updateProductCount();
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // Función para cambiar el status del producto
+        async function toggleProductStatus(productoId, currentActivo) {
+            try {
+                const newActivo = !currentActivo;
+                const newStatus = newActivo ? 'activo' : 'inactivo';
+                const productoRef = doc(db, 'productos', productoId);
+                
+                await updateDoc(productoRef, {
+                    status: newStatus,
+                    activo: newActivo
+                });
+
+                await cargarProductos();
+            } catch (error) {
+                console.error('Error al actualizar status:', error);
+                alert('Error al actualizar el status del producto.');
+            }
+        }
+
+        // Función para eliminar producto
+        async function eliminarProducto(productoId) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                try {
+                    await deleteDoc(doc(db, 'productos', productoId));
+                    await cargarProductos();
+                    alert('Producto eliminado exitosamente.');
+                } catch (error) {
+                    console.error('Error al eliminar producto:', error);
+                    alert('Error al eliminar el producto.');
+                }
+            }
+        }
+
+        // Función para editar producto (placeholder)
+        function editarProducto(productoId) {
+            alert('Función de edición en desarrollo. ID: ' + productoId);
+        }
+
+        // Cargar productos al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarProductos();
+        });
+
+        // Formatear precio mientras se escribe
+        document.getElementById('precioBase').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value) {
+                e.target.value = parseInt(value);
+            }
+        });
+    </script>
+</body>
+</html>

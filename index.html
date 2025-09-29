@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HairBiz Pro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #a855f7 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .purple-bg { background: linear-gradient(135deg, var(--primary-color), #a855f7); }
+        .orange-bg { background: linear-gradient(135deg, #f97316, #fb923c); }
+        .cyan-bg { background: linear-gradient(135deg, var(--secondary-color), #22d3ee); }
+        .green-bg { background: linear-gradient(135deg, var(--success-color), #34d399); }
+
+        .quick-actions {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #475569;
+            display: block;
+        }
+
+        .action-btn:hover {
+            background: #f8fafc;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .client-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .client-item:last-child {
+            border-bottom: none;
+        }
+
+        .client-info h6 {
+            margin: 0;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .client-info small {
+            color: #64748b;
+        }
+
+        .badge-purple {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .margin-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .margin-high {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .margin-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .margin-low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1.5rem 0;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .quick-actions {
+                padding: 1rem;
+            }
+            
+            .section-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="h2 mb-1">HairBiz Pro</h1>
+                    <p class="mb-0 opacity-75">Tu negocio de productos capilares, organizado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Metrics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-label">Ventas Totales</div>
+                            <div class="metric-value text-primary" id="ventasTotales">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                            <div class="metric-change text-success" id="ventasTotalesCambio">
+                                <i class="fas fa-arrow-up me-1"></i>Calculando...
+                            </div>
+                        </div>
+                        <div class="metric-icon purple-bg text-white">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-label">Cuentas por Cobrar</div>
+                            <div class="metric-value" style="color: #f97316;" id="cuentasPorCobrar">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                            <div class="metric-change text-muted" id="cuentasPorCobrarDetalle">
+                                Calculando pendientes...
+                            </div>
+                        </div>
+                        <div class="metric-icon orange-bg text-white">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-label">Productos</div>
+                            <div class="metric-value" style="color: #06b6d4;" id="totalProductos">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                            <div class="metric-change text-muted" id="totalProductosDetalle">
+                                Contando productos...
+                            </div>
+                        </div>
+                        <div class="metric-icon cyan-bg text-white">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-label">Ganancia Mensual</div>
+                            <div class="metric-value" style="color: #10b981;" id="gananciaMensual">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                            <div class="metric-change text-muted" id="gananciaMensualDetalle">
+                                Calculando ganancia...
+                            </div>
+                        </div>
+                        <div class="metric-icon green-bg text-white">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-label">Clientes Activos</div>
+                            <div class="metric-value" style="color: #8b5cf6;" id="clientesActivos">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                            <div class="metric-change text-muted" id="clientesActivosDetalle">
+                                Contando clientes...
+                            </div>
+                        </div>
+                        <div class="metric-icon purple-bg text-white">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-label">Margen de Ganancia</div>
+                            <div class="metric-value" style="color: #10b981;" id="margenGanancia">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                            <div class="metric-change text-success" id="margenGananciaDetalle">
+                                <i class="fas fa-arrow-up me-1"></i>Calculando...
+                            </div>
+                        </div>
+                        <div class="metric-icon green-bg text-white">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h5 class="section-title">
+                <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+            </h5>
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="action-btn" data-bs-toggle="modal" data-bs-target="#nuevoPedidoModal">
+                        <i class="fas fa-plus-circle fa-2x mb-2 text-primary"></i>
+                        <div class="fw-medium">Nuevo Pedido</div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="catalog.html" class="action-btn">
+                        <i class="fas fa-list fa-2x mb-2 text-info"></i>
+                        <div class="fw-medium">Catálogo</div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="clients.html" class="action-btn">
+                        <i class="fas fa-user-friends fa-2x mb-2 text-success"></i>
+                        <div class="fw-medium">Clientes</div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="reports.html" class="action-btn">
+                        <i class="fas fa-chart-bar fa-2x mb-2 text-warning"></i>
+                        <div class="fw-medium">Reportes</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="row g-4">
+            <!-- Recent Sales -->
+            <div class="col-lg-6">
+                <div class="section-card">
+                    <h5 class="section-title">Ventas Recientes</h5>
+                    <div id="ventasRecientesContainer">
+                        <!-- Las ventas se cargarán dinámicamente desde Firebase -->
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Cargando ventas recientes...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Selling Products -->
+            <div class="col-lg-6">
+                <div class="section-card">
+                    <h5 class="section-title">
+                        <i class="fas fa-fire text-warning me-2"></i>Productos Más Vendidos
+                    </h5>
+                    <div id="productosMasVendidosContainer">
+                        <!-- Los productos se cargarán dinámicamente desde Firebase -->
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Cargando productos más vendidos...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Pedido -->
+    <div class="modal fade" id="nuevoPedidoModal" tabindex="-1" aria-labelledby="nuevoPedidoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="border: none; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem;">
+                    <h5 class="modal-title" id="nuevoPedidoModalLabel" style="font-weight: 600; font-size: 1.25rem;">
+                        <i class="fas fa-plus-circle me-2"></i>Nuevo Pedido
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0) invert(1);"></button>
+                </div>
+                <div class="modal-body" style="padding: 2rem; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                    <form id="nuevoPedidoForm">
+                        <!-- Datos del Cliente -->
+                        <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); backdrop-filter: blur(10px); background: rgba(255,255,255,0.9);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px 15px 0 0; padding: 1rem 1.5rem;">
+                                <h6 class="mb-0" style="font-weight: 600;">
+                                    <i class="fas fa-user me-2"></i>Datos del Cliente
+                                </h6>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <div class="row g-3">
+                                    <div class="col-lg-6 col-md-12">
+                                        <label for="nombreCliente" class="form-label" style="font-weight: 500; color: #333;">Nombre *</label>
+                                        <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre completo" required style="border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem; transition: all 0.3s ease;">
+                                    </div>
+                                    <div class="col-lg-6 col-md-12">
+                                        <label for="telefonoCliente" class="form-label" style="font-weight: 500; color: #333;">Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefonoCliente" placeholder="+57 300 123 4567" style="border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem; transition: all 0.3s ease;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Productos del Pedido -->
+                        <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); backdrop-filter: blur(10px); background: rgba(255,255,255,0.9);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px 15px 0 0; padding: 1rem 1.5rem;" class="d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0" style="font-weight: 600;">
+                                    <i class="fas fa-box me-2"></i>Productos del Pedido
+                                </h6>
+                                <button type="button" class="btn btn-sm" onclick="agregarProducto()" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 0.5rem 1rem; margin-top: 0.5rem;">
+                                    <i class="fas fa-plus me-1"></i>Agregar
+                                </button>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <!-- Versión móvil de productos -->
+                                <div class="d-block d-lg-none" id="productosMovil">
+                                    <div class="producto-movil mb-3" style="background: #f8f9fa; border-radius: 12px; padding: 1rem; border: 2px solid #e9ecef;">
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Producto *</label>
+                                                <select class="form-select producto-select" required onchange="actualizarPrecio(this)" style="border-radius: 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                                                    <option value="">Seleccionar producto...</option>
+                                                    <option value="shampoo-anticaspa" data-precio="25">Shampoo Anti-Caspa</option>
+                                                    <option value="mascarilla-hidratante" data-precio="35">Mascarilla Hidratante</option>
+                                                    <option value="serum-reparador" data-precio="45">Serum Reparador</option>
+                                                    <option value="aceite-nutritivo" data-precio="30">Aceite Nutritivo</option>
+                                                    <option value="kit-tratamiento" data-precio="120">Kit Tratamiento Completo</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Cantidad</label>
+                                                <input type="number" class="form-control cantidad-input" value="1" min="1" onchange="calcularTotal(this)" style="border-radius: 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Precio *</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">$</span>
+                                                    <input type="number" class="form-control precio-input" step="0.01" min="0" required onchange="calcularTotal(this)" style="border-radius: 0 8px 8px 0; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                                                </div>
+                                            </div>
+                                            <div class="col-8">
+                                                <div class="d-flex align-items-center" style="height: 100%;">
+                                                    <span style="font-weight: 600; color: #667eea; font-size: 1.1rem;">Total: </span>
+                                                    <span class="fw-bold total-producto ms-2" style="color: #28a745; font-size: 1.2rem;">$0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" style="border-radius: 8px; padding: 0.5rem;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Versión desktop de productos -->
+                                <div class="table-responsive d-none d-lg-block">
+                                    <table class="table table-hover" style="border-radius: 10px; overflow: hidden;">
+                                        <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                            <tr>
+                                                <th style="border: none; padding: 1rem; font-weight: 600;">Producto *</th>
+                                                <th style="border: none; padding: 1rem; font-weight: 600;">Cantidad</th>
+                                                <th style="border: none; padding: 1rem; font-weight: 600;">Precio Unitario *</th>
+                                                <th style="border: none; padding: 1rem; font-weight: 600;">Total</th>
+                                                <th style="border: none; padding: 1rem; font-weight: 600;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="productosTableBody">
+                                            <tr class="producto-row" style="background: rgba(255,255,255,0.8);">
+                                                <td style="padding: 1rem; border: none;">
+                                                    <select class="form-select producto-select" required onchange="actualizarPrecio(this)" style="border-radius: 8px; border: 2px solid #e9ecef;">
+                                                        <option value="">Seleccionar producto...</option>
+                                                        <option value="shampoo-anticaspa" data-precio="25">Shampoo Anti-Caspa</option>
+                                                        <option value="mascarilla-hidratante" data-precio="35">Mascarilla Hidratante</option>
+                                                        <option value="serum-reparador" data-precio="45">Serum Reparador</option>
+                                                        <option value="aceite-nutritivo" data-precio="30">Aceite Nutritivo</option>
+                                                        <option value="kit-tratamiento" data-precio="120">Kit Tratamiento Completo</option>
+                                                    </select>
+                                                </td>
+                                                <td style="padding: 1rem; border: none;">
+                                                    <input type="number" class="form-control cantidad-input" value="1" min="1" onchange="calcularTotal(this)" style="border-radius: 8px; border: 2px solid #e9ecef;">
+                                                </td>
+                                                <td style="padding: 1rem; border: none;">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef;">$</span>
+                                                        <input type="number" class="form-control precio-input" step="0.01" min="0" required onchange="calcularTotal(this)" style="border-radius: 0 8px 8px 0; border: 2px solid #e9ecef;">
+                                                    </div>
+                                                </td>
+                                                <td style="padding: 1rem; border: none;">
+                                                    <span class="fw-bold total-producto" style="color: #28a745; font-size: 1.1rem;">$0</span>
+                                                </td>
+                                                <td style="padding: 1rem; border: none;">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" style="border-radius: 8px;">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-muted" style="font-style: italic;">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Puedes agregar observaciones específicas para cada producto en el campo de notas al final.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pago y Entrega -->
+                        <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); backdrop-filter: blur(10px); background: rgba(255,255,255,0.9);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px 15px 0 0; padding: 1rem 1.5rem;">
+                                <h6 class="mb-0" style="font-weight: 600;">
+                                    <i class="fas fa-credit-card me-2"></i>Pago y Entrega
+                                </h6>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <div class="row g-3">
+                                    <div class="col-lg-6 col-md-12">
+                                        <label for="metodoPago" class="form-label" style="font-weight: 500; color: #333;">Método de Pago</label>
+                                        <select class="form-select" id="metodoPago" style="border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem; transition: all 0.3s ease;">
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="transferencia">Transferencia</option>
+                                            <option value="tarjeta">Tarjeta</option>
+                                            <option value="credito">Crédito</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12">
+                                        <label for="fechaEntrega" class="form-label" style="font-weight: 500; color: #333;">Fecha de Entrega</label>
+                                        <input type="date" class="form-control" id="fechaEntrega" style="border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem; transition: all 0.3s ease;">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="anticiposPago" class="form-label" style="font-weight: 500; color: #333;">Anticipos</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text" style="border-radius: 10px 0 0 10px; border: 2px solid #e9ecef; background: #f8f9fa;">$</span>
+                                            <input type="number" class="form-control" id="anticiposPago" step="0.01" min="0" placeholder="0.00" onchange="calcularResumen()" style="border-radius: 0 10px 10px 0; border: 2px solid #e9ecef; padding: 0.75rem; transition: all 0.3s ease;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumen del Pedido -->
+                        <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); backdrop-filter: blur(10px); background: rgba(255,255,255,0.9);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px 15px 0 0; padding: 1rem 1.5rem;">
+                                <h6 class="mb-0" style="font-weight: 600;">
+                                    <i class="fas fa-calculator me-2"></i>Resumen del Pedido
+                                </h6>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <div class="row">
+                                    <div class="col-lg-8 col-md-12 mb-3 mb-lg-0">
+                                        <div class="mb-3">
+                                            <label for="notasPedido" class="form-label" style="font-weight: 500; color: #333;">Notas del Pedido</label>
+                                            <textarea class="form-control" id="notasPedido" rows="3" placeholder="Observaciones adicionales, instrucciones especiales, etc." style="border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem; transition: all 0.3s ease; resize: vertical;"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-12">
+                                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem; border-radius: 15px; border: 2px solid #e9ecef;">
+                                            <div class="d-flex justify-content-between mb-2" style="padding: 0.5rem 0; border-bottom: 1px solid #dee2e6;">
+                                                <span style="font-weight: 500; color: #495057;">Subtotal:</span>
+                                                <span id="subtotalPedido" class="fw-bold" style="color: #495057;">$0</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2" style="padding: 0.5rem 0; border-bottom: 1px solid #dee2e6;">
+                                                <span style="font-weight: 500; color: #495057;">Anticipos:</span>
+                                                <span id="anticiposDisplay" class="text-success fw-bold">-$0</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between" style="padding: 0.75rem 0;">
+                                                <span class="fw-bold" style="color: #333; font-size: 1.1rem;">Total del Pedido:</span>
+                                                <span id="totalPedido" class="fw-bold" style="color: #667eea; font-size: 1.3rem;">$0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border: none; padding: 1.5rem; border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: rgba(108, 117, 125, 0.1); color: #6c757d; border: 2px solid #6c757d; border-radius: 10px; padding: 0.75rem 1.5rem; font-weight: 500; transition: all 0.3s ease;">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn" onclick="guardarPedido()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-weight: 500; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-save me-1"></i>Guardar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, limit, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVUmZ7t3xC3_Hz5mGM4IG3PcFUi6utxDQ",
+            authDomain: "hairbiz-6262f.firebaseapp.com",
+            projectId: "hairbiz-6262f",
+            storageBucket: "hairbiz-6262f.firebasestorage.app",
+            messagingSenderId: "1061804186635",
+            appId: "1:1061804186635:web:7b904658deda5852577b0e"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase functions globally available
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.where = where;
+        window.getDoc = getDoc;
+    </script>
+    
+    <!-- CSS adicional para el modal mejorado -->
+    <style>
+        /* Efectos hover para inputs */
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+        }
+        
+        /* Efectos hover para botones */
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+        }
+        
+        /* Animaciones suaves */
+        .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive breakpoints personalizados */
+        @media (max-width: 991.98px) {
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .modal-body {
+                padding: 1rem !important;
+            }
+            
+            .card-body {
+                padding: 1rem !important;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .modal-dialog {
+                margin: 0.25rem;
+            }
+            
+            .modal-header {
+                padding: 1rem !important;
+            }
+            
+            .modal-footer {
+                padding: 1rem !important;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
+    
+    <script>
+        // Variables globales
+        let contadorProductos = 1;
+
+        // Función para agregar un nuevo producto
+        function agregarProducto() {
+            // Versión móvil
+            const contenedorMovil = document.getElementById('productosMovil');
+            if (window.innerWidth < 992) {
+                const nuevoProductoMovil = document.createElement('div');
+                nuevoProductoMovil.className = 'producto-movil mb-3';
+                nuevoProductoMovil.style.cssText = 'background: #f8f9fa; border-radius: 12px; padding: 1rem; border: 2px solid #e9ecef;';
+                nuevoProductoMovil.innerHTML = `
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Producto *</label>
+                            <select class="form-select producto-select" required onchange="actualizarPrecio(this)" style="border-radius: 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                                <option value="">Seleccionar producto...</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Cantidad</label>
+                            <input type="number" class="form-control cantidad-input" value="1" min="1" onchange="calcularTotal(this)" style="border-radius: 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Precio *</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">$</span>
+                                <input type="number" class="form-control precio-input" step="0.01" min="0" required onchange="calcularTotal(this)" style="border-radius: 0 8px 8px 0; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="d-flex align-items-center" style="height: 100%;">
+                                <span style="font-weight: 600; color: #667eea; font-size: 1.1rem;">Total: </span>
+                                <span class="fw-bold total-producto ms-2" style="color: #28a745; font-size: 1.2rem;">$0</span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" style="border-radius: 8px; padding: 0.5rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                contenedorMovil.appendChild(nuevoProductoMovil);
+            } else {
+                // Versión desktop
+                const tbody = document.getElementById('productosTableBody');
+                const nuevaFila = document.createElement('tr');
+                nuevaFila.className = 'producto-row';
+                nuevaFila.style.background = 'rgba(255,255,255,0.8)';
+                nuevaFila.innerHTML = `
+                    <td style="padding: 1rem; border: none;">
+                        <select class="form-select producto-select" required onchange="actualizarPrecio(this)" style="border-radius: 8px; border: 2px solid #e9ecef;">
+                            <option value="">Seleccionar producto...</option>
+                        </select>
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <input type="number" class="form-control cantidad-input" value="1" min="1" onchange="calcularTotal(this)" style="border-radius: 8px; border: 2px solid #e9ecef;">
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <div class="input-group">
+                            <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef;">$</span>
+                            <input type="number" class="form-control precio-input" step="0.01" min="0" required onchange="calcularTotal(this)" style="border-radius: 0 8px 8px 0; border: 2px solid #e9ecef;">
+                        </div>
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <span class="fw-bold total-producto" style="color: #28a745; font-size: 1.1rem;">$0</span>
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" style="border-radius: 8px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(nuevaFila);
+            }
+            contadorProductos++;
+            
+            // Cargar productos de Firebase en el nuevo selector
+            cargarProductosEnSelectores();
+        }
+
+        // Función para eliminar un producto
+        function eliminarProducto(boton) {
+            const contenedor = boton.closest('.producto-row') || boton.closest('.producto-movil');
+            contenedor.remove();
+            calcularResumen();
+        }
+
+        // Función para actualizar el precio cuando se selecciona un producto
+        function actualizarPrecio(select) {
+            const opcionSeleccionada = select.options[select.selectedIndex];
+            const precio = opcionSeleccionada.getAttribute('data-precio');
+            const contenedor = select.closest('.producto-row') || select.closest('.producto-movil');
+            const inputPrecio = contenedor.querySelector('.precio-input');
+            
+            if (precio) {
+                inputPrecio.value = precio;
+                calcularTotal(inputPrecio);
+            }
+        }
+
+        // Función para calcular el total de una fila
+        function calcularTotal(elemento) {
+            const contenedor = elemento.closest('.producto-row') || elemento.closest('.producto-movil');
+            const cantidad = parseFloat(contenedor.querySelector('.cantidad-input').value) || 0;
+            const precio = parseFloat(contenedor.querySelector('.precio-input').value) || 0;
+            const total = cantidad * precio;
+            
+            contenedor.querySelector('.total-producto').textContent = `$${total.toFixed(2)}`;
+            calcularResumen();
+        }
+
+        // Función para calcular el resumen del pedido
+        function calcularResumen() {
+            const filasProductos = document.querySelectorAll('.producto-row, .producto-movil');
+            let subtotal = 0;
+            
+            filasProductos.forEach(contenedor => {
+                const cantidad = parseFloat(contenedor.querySelector('.cantidad-input').value) || 0;
+                const precio = parseFloat(contenedor.querySelector('.precio-input').value) || 0;
+                subtotal += cantidad * precio;
+            });
+            
+            const anticipos = parseFloat(document.getElementById('anticiposPago').value) || 0;
+            const total = subtotal - anticipos;
+            
+            document.getElementById('subtotalPedido').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('anticiposDisplay').textContent = `-$${anticipos.toFixed(2)}`;
+            document.getElementById('totalPedido').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Función para guardar el pedido en Firebase
+        async function guardarPedido() {
+            const form = document.getElementById('nuevoPedidoForm');
+            
+            try {
+                // Validar campos requeridos
+                const nombreCliente = document.getElementById('nombreCliente').value.trim();
+                if (!nombreCliente) {
+                    alert('Por favor ingresa el nombre del cliente');
+                    return;
+                }
+                
+                // Recopilar productos del pedido
+                const productos = [];
+                const productosSeleccionados = document.querySelectorAll('.producto-select');
+                
+                for (let i = 0; i < productosSeleccionados.length; i++) {
+                    const select = productosSeleccionados[i];
+                    if (select.value) {
+                        const row = select.closest('.producto-row, .producto-movil');
+                        const cantidad = parseInt(row.querySelector('.cantidad-input').value);
+                        const precio = parseFloat(row.querySelector('.precio-input').value);
+                        const total = cantidad * precio;
+                        
+                        // Obtener datos del producto desde Firebase
+                        const productoDoc = await getDoc(doc(db, 'productos', select.value));
+                        const productoData = productoDoc.data();
+                        
+                        productos.push({
+                            id: select.value,
+                            nombre: productoData.nombre,
+                            categoria: productoData.categoria,
+                            cantidad: cantidad,
+                            precioVenta: precio,
+                            precioCompra: productoData.precioCompra || 0,
+                            total: total,
+                            margenGanancia: productoData.margenGanancia || 0
+                        });
+                    }
+                }
+                
+                if (productos.length === 0) {
+                    alert('Por favor agrega al menos un producto al pedido');
+                    return;
+                }
+                
+                // Calcular totales del pedido
+                const subtotal = productos.reduce((sum, producto) => sum + producto.total, 0);
+                const anticipos = parseFloat(document.getElementById('anticiposPago').value) || 0;
+                const total = subtotal;
+                const costoTotal = productos.reduce((sum, producto) => sum + (producto.precioCompra * producto.cantidad), 0);
+                const gananciaBruta = total - costoTotal;
+                
+                // Crear objeto del pedido
+                const pedido = {
+                    cliente: {
+                        nombre: nombreCliente,
+                        telefono: document.getElementById('telefonoCliente').value.trim() || ''
+                    },
+                    productos: productos,
+                    resumen: {
+                        subtotal: subtotal,
+                        anticipos: anticipos,
+                        total: total,
+                        costoTotal: costoTotal,
+                        gananciaBruta: gananciaBruta,
+                        margenPorcentaje: costoTotal > 0 ? ((gananciaBruta / total) * 100) : 0
+                    },
+                    fechaCreacion: new Date(),
+                    estado: 'completado',
+                    notas: document.getElementById('notasPedido').value.trim() || ''
+                };
+                
+                // Guardar en Firebase
+                await addDoc(collection(db, 'pedidos'), pedido);
+                
+                alert('Pedido guardado exitosamente!');
+                
+                // Cerrar modal y limpiar formulario
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoPedidoModal'));
+                modal.hide();
+                form.reset();
+                
+                // Limpiar productos
+                limpiarProductos();
+                calcularResumen();
+                
+                // Actualizar dashboard de ventas
+                cargarVentasRecientes();
+                cargarProductosMasVendidos();
+                
+            } catch (error) {
+                console.error('Error al guardar pedido:', error);
+                alert('Error al guardar el pedido. Por favor intenta nuevamente.');
+            }
+        }
+
+        // Función para limpiar productos
+        function limpiarProductos() {
+            // Limpiar versión desktop
+            const tbody = document.getElementById('productosTableBody');
+            tbody.innerHTML = `
+                <tr class="producto-row" style="background: rgba(255,255,255,0.8);">
+                    <td style="padding: 1rem; border: none;">
+                        <select class="form-select producto-select" required onchange="actualizarPrecio(this)" style="border-radius: 8px; border: 2px solid #e9ecef;">
+                            <option value="">Seleccionar producto...</option>
+                            <option value="shampoo-anticaspa" data-precio="25">Shampoo Anti-Caspa</option>
+                            <option value="mascarilla-hidratante" data-precio="35">Mascarilla Hidratante</option>
+                            <option value="serum-reparador" data-precio="45">Serum Reparador</option>
+                            <option value="aceite-nutritivo" data-precio="30">Aceite Nutritivo</option>
+                            <option value="kit-tratamiento" data-precio="120">Kit Tratamiento Completo</option>
+                        </select>
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <input type="number" class="form-control cantidad-input" value="1" min="1" onchange="calcularTotal(this)" style="border-radius: 8px; border: 2px solid #e9ecef;">
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <div class="input-group">
+                            <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef;">$</span>
+                            <input type="number" class="form-control precio-input" step="0.01" min="0" required onchange="calcularTotal(this)" style="border-radius: 0 8px 8px 0; border: 2px solid #e9ecef;">
+                        </div>
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <span class="fw-bold total-producto" style="color: #28a745; font-size: 1.1rem;">$0</span>
+                    </td>
+                    <td style="padding: 1rem; border: none;">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" style="border-radius: 8px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            // Limpiar versión móvil
+            const contenedorMovil = document.getElementById('productosMovil');
+            contenedorMovil.innerHTML = `
+                <div class="producto-movil mb-3" style="background: #f8f9fa; border-radius: 12px; padding: 1rem; border: 2px solid #e9ecef;">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Producto *</label>
+                            <select class="form-select producto-select" required onchange="actualizarPrecio(this)" style="border-radius: 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                                <option value="">Seleccionar producto...</option>
+                                <option value="shampoo-anticaspa" data-precio="25">Shampoo Anti-Caspa</option>
+                                <option value="mascarilla-hidratante" data-precio="35">Mascarilla Hidratante</option>
+                                <option value="serum-reparador" data-precio="45">Serum Reparador</option>
+                                <option value="aceite-nutritivo" data-precio="30">Aceite Nutritivo</option>
+                                <option value="kit-tratamiento" data-precio="120">Kit Tratamiento Completo</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Cantidad</label>
+                            <input type="number" class="form-control cantidad-input" value="1" min="1" onchange="calcularTotal(this)" style="border-radius: 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" style="font-weight: 500; color: #333; font-size: 0.9rem;">Precio *</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef; font-size: 0.9rem;">$</span>
+                                <input type="number" class="form-control precio-input" step="0.01" min="0" required onchange="calcularTotal(this)" style="border-radius: 0 8px 8px 0; border: 2px solid #e9ecef; font-size: 0.9rem;">
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="d-flex align-items-center" style="height: 100%;">
+                                <span style="font-weight: 600; color: #667eea; font-size: 1.1rem;">Total: </span>
+                                <span class="fw-bold total-producto ms-2" style="color: #28a745; font-size: 1.2rem;">$0</span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" style="border-radius: 8px; padding: 0.5rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Establecer fecha mínima como hoy
+        // Función para cargar productos desde Firebase y actualizar los selectores
+        async function cargarProductosEnSelectores() {
+            try {
+                console.log('Iniciando carga de productos...');
+                
+                // Verificar conexión a Firebase
+                if (!db) {
+                    console.error('Base de datos no inicializada');
+                    throw new Error('Base de datos no inicializada');
+                }
+                
+                console.log('Consultando productos en Firebase...');
+                const productosRef = collection(db, 'productos');
+                // Primero obtenemos todos los productos activos sin ordenar para evitar el índice compuesto
+                const q = query(productosRef, where('activo', '==', true));
+                const querySnapshot = await getDocs(q);
+                
+                console.log(`Encontrados ${querySnapshot.size} productos en Firebase`);
+                
+                if (querySnapshot.empty) {
+                    console.warn('No se encontraron productos activos en Firebase');
+                    const selectores = document.querySelectorAll('.producto-select');
+                    selectores.forEach(selector => {
+                        selector.innerHTML = '<option value="">No hay productos disponibles</option>';
+                    });
+                    return;
+                }
+                
+                const productos = [];
+                querySnapshot.forEach((doc) => {
+                    const producto = doc.data();
+                    console.log('Producto encontrado:', doc.id, producto);
+                    productos.push({
+                        id: doc.id,
+                        nombre: producto.nombre || 'Sin nombre',
+                        precio: producto.precio || 0,
+                        precioCompra: producto.precioCompra || 0,
+                        margenGanancia: producto.margenGanancia || 0,
+                        categoria: producto.categoria || '',
+                        descripcion: producto.descripcion || ''
+                    });
+                });
+
+                // Ordenar productos por nombre en el cliente
+                productos.sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+                // Actualizar todos los selectores de productos
+                const selectores = document.querySelectorAll('.producto-select');
+                console.log(`Actualizando ${selectores.length} selectores`);
+                
+                if (selectores.length === 0) {
+                    console.warn('No se encontraron selectores de productos en el DOM');
+                    return;
+                }
+                
+                selectores.forEach((selector, index) => {
+                    console.log(`Actualizando selector ${index + 1}`);
+                    // Limpiar opciones existentes excepto la primera
+                    selector.innerHTML = '<option value="">Seleccionar producto...</option>';
+                    
+                    // Agregar productos desde Firebase
+                    productos.forEach(producto => {
+                        const option = document.createElement('option');
+                        option.value = producto.id;
+                        option.textContent = `${producto.nombre} - $${producto.precio}`;
+                        option.setAttribute('data-precio', producto.precio);
+                        option.setAttribute('data-precio-compra', producto.precioCompra);
+                        option.setAttribute('data-margen', producto.margenGanancia);
+                        option.setAttribute('data-categoria', producto.categoria);
+                        option.setAttribute('data-descripcion', producto.descripcion);
+                        selector.appendChild(option);
+                    });
+                });
+
+                console.log(`✅ Cargados ${productos.length} productos en ${selectores.length} selectores exitosamente`);
+                
+            } catch (error) {
+                console.error('❌ Error detallado al cargar productos:', error);
+                console.error('Stack trace:', error.stack);
+                
+                // Mostrar mensaje de error específico al usuario
+                const selectores = document.querySelectorAll('.producto-select');
+                selectores.forEach(selector => {
+                    selector.innerHTML = `<option value="">Error: ${error.message}</option>`;
+                });
+                
+                // Mostrar alerta con más detalles
+                alert(`Error al cargar productos: ${error.message}\n\nRevisa la consola del navegador para más detalles.`);
+            }
+        }
+
+        // Función para cargar ventas recientes desde Firebase
+        async function cargarVentasRecientes() {
+            try {
+                // Importar limit dinámicamente si no está disponible
+                const { limit: limitFunc } = await import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js");
+                
+                const container = document.getElementById('ventasRecientesContainer');
+                
+                // Consultar los últimos 5 pedidos
+                const q = query(
+                    collection(db, 'pedidos'), 
+                    orderBy('fechaCreacion', 'desc'), 
+                    limitFunc(5)
+                );
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-inbox me-2"></i>No hay ventas registradas
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    const fecha = pedido.fechaCreacion.toDate();
+                    const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Obtener el primer producto del pedido para mostrar
+                    const primerProducto = pedido.productos[0];
+                    const productosExtra = pedido.productos.length > 1 ? ` +${pedido.productos.length - 1} más` : '';
+                    
+                    html += `
+                        <div class="client-item">
+                            <div class="client-info">
+                                <h6>${pedido.cliente.nombre}</h6>
+                                <small>${primerProducto.nombre}${productosExtra}</small>
+                                <small class="text-muted d-block">${fechaFormateada}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge badge-purple">$${pedido.resumen.total.toLocaleString()}</span>
+                                <small class="text-success d-block">+$${pedido.resumen.gananciaBruta.toLocaleString()}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error al cargar ventas recientes:', error);
+                document.getElementById('ventasRecientesContainer').innerHTML = `
+                    <div class="text-center text-danger py-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Error al cargar ventas
+                    </div>
+                `;
+            }
+        }
+
+        // Función para cargar productos más vendidos desde Firebase
+        async function cargarProductosMasVendidos() {
+            try {
+                const container = document.getElementById('productosMasVendidosContainer');
+                
+                // Obtener todos los pedidos para calcular productos más vendidos
+                const q = query(collection(db, 'pedidos'));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-inbox me-2"></i>No hay datos de ventas
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Contar productos vendidos
+                const productosVendidos = {};
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    pedido.productos.forEach(producto => {
+                        if (!productosVendidos[producto.id]) {
+                            productosVendidos[producto.id] = {
+                                nombre: producto.nombre,
+                                categoria: producto.categoria,
+                                cantidad: 0,
+                                ingresos: 0,
+                                ganancia: 0
+                            };
+                        }
+                        productosVendidos[producto.id].cantidad += producto.cantidad;
+                        productosVendidos[producto.id].ingresos += producto.total;
+                        productosVendidos[producto.id].ganancia += (producto.total - (producto.precioCompra * producto.cantidad));
+                    });
+                });
+                
+                // Ordenar por cantidad vendida y tomar los top 4
+                const topProductos = Object.values(productosVendidos)
+                    .sort((a, b) => b.cantidad - a.cantidad)
+                    .slice(0, 4);
+                
+                if (topProductos.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-inbox me-2"></i>No hay productos vendidos
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                topProductos.forEach(producto => {
+                    const margenPorcentaje = producto.ingresos > 0 ? ((producto.ganancia / producto.ingresos) * 100) : 0;
+                    let margenBadge = 'margin-high';
+                    let margenText = 'Alto';
+                    
+                    if (margenPorcentaje < 20) {
+                        margenBadge = 'margin-low';
+                        margenText = 'Bajo';
+                    } else if (margenPorcentaje < 40) {
+                        margenBadge = 'margin-medium';
+                        margenText = 'Medio';
+                    }
+                    
+                    html += `
+                        <div class="product-item">
+                            <div>
+                                <h6 class="mb-1">${producto.nombre}</h6>
+                                <small class="text-muted">Ventas: ${producto.cantidad} unidades</small>
+                                <small class="text-success d-block">Margen: ${margenPorcentaje.toFixed(1)}%</small>
+                            </div>
+                            <span class="margin-badge ${margenBadge}">${margenText}</span>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error al cargar productos más vendidos:', error);
+                document.getElementById('productosMasVendidosContainer').innerHTML = `
+                    <div class="text-center text-danger py-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Error al cargar productos
+                    </div>
+                `;
+            }
+        }
+
+        // Función para cargar todas las métricas del dashboard
+        async function cargarMetricasDashboard() {
+            try {
+                await Promise.all([
+                    cargarVentasTotales(),
+                    cargarCuentasPorCobrar(),
+                    cargarTotalProductos(),
+                    cargarGananciaMensual(),
+                    cargarClientesActivos(),
+                    cargarMargenGanancia()
+                ]);
+            } catch (error) {
+                console.error('Error al cargar métricas del dashboard:', error);
+            }
+        }
+
+        // Función para cargar ventas totales
+        async function cargarVentasTotales() {
+            try {
+                const q = query(collection(db, 'pedidos'), where('estado', '==', 'completado'));
+                const querySnapshot = await getDocs(q);
+                
+                let totalVentas = 0;
+                let ventasEsteMes = 0;
+                let ventasMesAnterior = 0;
+                
+                const fechaActual = new Date();
+                const mesActual = fechaActual.getMonth();
+                const añoActual = fechaActual.getFullYear();
+                
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    const total = pedido.resumen?.total || 0;
+                    totalVentas += total;
+                    
+                    const fechaPedido = pedido.fechaCreacion?.toDate() || new Date(pedido.fechaCreacion);
+                    if (fechaPedido.getMonth() === mesActual && fechaPedido.getFullYear() === añoActual) {
+                        ventasEsteMes += total;
+                    } else if (fechaPedido.getMonth() === (mesActual - 1) && fechaPedido.getFullYear() === añoActual) {
+                        ventasMesAnterior += total;
+                    }
+                });
+                
+                const cambioMensual = ventasMesAnterior > 0 ? ((ventasEsteMes - ventasMesAnterior) / ventasMesAnterior * 100) : 0;
+                
+                document.getElementById('ventasTotales').textContent = `$${totalVentas.toLocaleString()}`;
+                document.getElementById('ventasTotalesCambio').innerHTML = `
+                    <i class="fas fa-arrow-${cambioMensual >= 0 ? 'up' : 'down'} me-1"></i>
+                    ${cambioMensual >= 0 ? '+' : ''}${cambioMensual.toFixed(1)}% vs mes anterior
+                `;
+                document.getElementById('ventasTotalesCambio').className = `metric-change ${cambioMensual >= 0 ? 'text-success' : 'text-danger'}`;
+                
+            } catch (error) {
+                console.error('Error al cargar ventas totales:', error);
+                document.getElementById('ventasTotales').textContent = 'Error';
+                document.getElementById('ventasTotalesCambio').textContent = 'No disponible';
+            }
+        }
+
+        // Función para cargar cuentas por cobrar
+        async function cargarCuentasPorCobrar() {
+            try {
+                const q = query(collection(db, 'pedidos'), where('estado', '==', 'pendiente'));
+                const querySnapshot = await getDocs(q);
+                
+                let totalPendiente = 0;
+                let cantidadPendientes = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    totalPendiente += pedido.resumen?.total || 0;
+                    cantidadPendientes++;
+                });
+                
+                document.getElementById('cuentasPorCobrar').textContent = `$${totalPendiente.toLocaleString()}`;
+                document.getElementById('cuentasPorCobrarDetalle').textContent = `${cantidadPendientes} pedidos pendientes`;
+                
+            } catch (error) {
+                console.error('Error al cargar cuentas por cobrar:', error);
+                document.getElementById('cuentasPorCobrar').textContent = 'Error';
+                document.getElementById('cuentasPorCobrarDetalle').textContent = 'No disponible';
+            }
+        }
+
+        // Función para cargar total de productos
+        async function cargarTotalProductos() {
+            try {
+                const q = query(collection(db, 'productos'), where('activo', '==', true));
+                const querySnapshot = await getDocs(q);
+                
+                let totalProductos = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    totalProductos++;
+                });
+                
+                document.getElementById('totalProductos').textContent = totalProductos;
+                document.getElementById('totalProductosDetalle').textContent = 'Productos activos';
+                
+            } catch (error) {
+                console.error('Error al cargar total de productos:', error);
+                document.getElementById('totalProductos').textContent = 'Error';
+                document.getElementById('totalProductosDetalle').textContent = 'No disponible';
+            }
+        }
+
+        // Función para cargar ganancia mensual
+        async function cargarGananciaMensual() {
+            try {
+                const fechaActual = new Date();
+                const mesActual = fechaActual.getMonth();
+                const añoActual = fechaActual.getFullYear();
+                
+                const q = query(collection(db, 'pedidos'), where('estado', '==', 'completado'));
+                const querySnapshot = await getDocs(q);
+                
+                let gananciaMensual = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    const fechaPedido = pedido.fechaCreacion?.toDate() || new Date(pedido.fechaCreacion);
+                    
+                    if (fechaPedido.getMonth() === mesActual && fechaPedido.getFullYear() === añoActual) {
+                        gananciaMensual += pedido.resumen?.gananciaBruta || 0;
+                    }
+                });
+                
+                document.getElementById('gananciaMensual').textContent = `$${gananciaMensual.toLocaleString()}`;
+                document.getElementById('gananciaMensualDetalle').textContent = 'Ganancia del mes';
+                
+            } catch (error) {
+                console.error('Error al cargar ganancia mensual:', error);
+                document.getElementById('gananciaMensual').textContent = 'Error';
+                document.getElementById('gananciaMensualDetalle').textContent = 'No disponible';
+            }
+        }
+
+        // Función para cargar clientes activos
+        async function cargarClientesActivos() {
+            try {
+                const fechaActual = new Date();
+                const mesActual = fechaActual.getMonth();
+                const añoActual = fechaActual.getFullYear();
+                
+                const q = query(collection(db, 'pedidos'));
+                const querySnapshot = await getDocs(q);
+                
+                const clientesUnicos = new Set();
+                
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    const fechaPedido = pedido.fechaCreacion?.toDate() || new Date(pedido.fechaCreacion);
+                    
+                    if (fechaPedido.getMonth() === mesActual && fechaPedido.getFullYear() === añoActual) {
+                        if (pedido.cliente?.nombre) {
+                            clientesUnicos.add(pedido.cliente.nombre.toLowerCase());
+                        }
+                    }
+                });
+                
+                document.getElementById('clientesActivos').textContent = clientesUnicos.size;
+                document.getElementById('clientesActivosDetalle').textContent = 'Este mes';
+                
+            } catch (error) {
+                console.error('Error al cargar clientes activos:', error);
+                document.getElementById('clientesActivos').textContent = 'Error';
+                document.getElementById('clientesActivosDetalle').textContent = 'No disponible';
+            }
+        }
+
+        // Función para cargar margen de ganancia promedio
+        async function cargarMargenGanancia() {
+            try {
+                const q = query(collection(db, 'pedidos'), where('estado', '==', 'completado'));
+                const querySnapshot = await getDocs(q);
+                
+                let totalMargen = 0;
+                let cantidadPedidos = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const pedido = doc.data();
+                    if (pedido.resumen?.margenPorcentaje) {
+                        totalMargen += pedido.resumen.margenPorcentaje;
+                        cantidadPedidos++;
+                    }
+                });
+                
+                const margenPromedio = cantidadPedidos > 0 ? totalMargen / cantidadPedidos : 0;
+                let clasificacion = 'Bajo';
+                let colorClase = 'text-danger';
+                
+                if (margenPromedio >= 30) {
+                    clasificacion = 'Excelente';
+                    colorClase = 'text-success';
+                } else if (margenPromedio >= 20) {
+                    clasificacion = 'Bueno';
+                    colorClase = 'text-warning';
+                }
+                
+                document.getElementById('margenGanancia').textContent = `${margenPromedio.toFixed(1)}%`;
+                document.getElementById('margenGananciaDetalle').innerHTML = `
+                    <i class="fas fa-arrow-up me-1"></i>${clasificacion}
+                `;
+                document.getElementById('margenGananciaDetalle').className = `metric-change ${colorClase}`;
+                
+            } catch (error) {
+                console.error('Error al cargar margen de ganancia:', error);
+                document.getElementById('margenGanancia').textContent = 'Error';
+                document.getElementById('margenGananciaDetalle').textContent = 'No disponible';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaEntrega = document.getElementById('fechaEntrega');
+            const hoy = new Date().toISOString().split('T')[0];
+            fechaEntrega.min = hoy;
+            fechaEntrega.value = hoy;
+            
+            // Cargar productos desde Firebase
+            cargarProductosEnSelectores();
+            
+            // Cargar datos del dashboard
+            cargarVentasRecientes();
+            cargarProductosMasVendidos();
+            cargarMetricasDashboard();
+        });
+    </script>
+</body>
+</html>
