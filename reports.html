@@ -425,10 +425,10 @@
                         Margen de Ganancia
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill progress-success" style="width: 51.6%"></div>
+                        <div class="progress-fill progress-success" id="margenProgress" style="width: 0%"></div>
                     </div>
                     <div class="progress-text">
-                        <span>51.6%</span>
+                        <span id="margenValue">0%</span>
                         <span>vs mes anterior</span>
                     </div>
                 </div>
@@ -439,11 +439,11 @@
                         ROI (Retorno de Inversión)
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill progress-warning" style="width: 106.7%"></div>
+                        <div class="progress-fill progress-warning" id="roiProgress" style="width: 0%"></div>
                     </div>
                     <div class="progress-text">
-                        <span>106.7%</span>
-                        <span>Excelente rendimiento</span>
+                        <span id="roiValue">0%</span>
+                        <span id="roiDescription">Calculando...</span>
                     </div>
                 </div>
 
@@ -453,11 +453,11 @@
                         Ticket Promedio
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill progress-primary" style="width: 75%"></div>
+                        <div class="progress-fill progress-primary" id="ticketProgress" style="width: 0%"></div>
                     </div>
                     <div class="progress-text">
-                        <span>$65,714</span>
-                        <span>Por cliente</span>
+                        <span id="ticketValue">$0</span>
+                        <span>Por pedido</span>
                     </div>
                 </div>
             </div>
@@ -549,33 +549,55 @@
         // Función para cargar datos de reportes desde Firebase
         async function cargarDatosReportes() {
             try {
+                console.log('Iniciando carga de datos de reportes...');
+                
                 // Mostrar indicador de carga
                 mostrarCargando();
 
                 // Obtener pedidos
+                console.log('Obteniendo pedidos de Firebase...');
                 const pedidosSnapshot = await getDocs(collection(db, 'pedidos'));
                 const pedidos = [];
                 pedidosSnapshot.forEach((doc) => {
                     pedidos.push({ id: doc.id, ...doc.data() });
                 });
+                console.log(`Pedidos obtenidos: ${pedidos.length}`);
 
                 // Obtener productos
+                console.log('Obteniendo productos de Firebase...');
                 const productosSnapshot = await getDocs(collection(db, 'productos'));
                 const productos = [];
                 productosSnapshot.forEach((doc) => {
                     productos.push({ id: doc.id, ...doc.data() });
                 });
+                console.log(`Productos obtenidos: ${productos.length}`);
+
+                // Verificar si hay datos
+                if (pedidos.length === 0) {
+                    console.warn('No se encontraron pedidos en Firebase');
+                    mostrarMensajeVacio('pedidos');
+                    return;
+                }
+
+                if (productos.length === 0) {
+                    console.warn('No se encontraron productos en Firebase');
+                    mostrarMensajeVacio('productos');
+                    return;
+                }
 
                 // Calcular métricas
+                console.log('Calculando métricas...');
                 calcularMetricas(pedidos, productos);
                 
                 // Ocultar indicador de carga
                 ocultarCargando();
+                console.log('Datos de reportes cargados exitosamente');
 
             } catch (error) {
-                console.error('Error al cargar datos de reportes: ', error);
+                console.error('Error detallado al cargar datos de reportes: ', error);
+                console.error('Stack trace:', error.stack);
                 ocultarCargando();
-                mostrarError();
+                mostrarError(error.message);
             }
         }
 
@@ -616,6 +638,9 @@
             
             // Calcular análisis de rendimiento
             calcularAnalisisRendimiento(ventasTotales, costoTotal, gananciaNeta);
+            
+            // Calcular ticket promedio
+            calcularTicketPromedio(pedidos, ventasTotales);
             
             // Cargar productos más vendidos
             cargarProductosMasVendidos(pedidos, productos);
@@ -666,26 +691,53 @@
             const margenGanancia = ventas > 0 ? (ganancia / ventas) * 100 : 0;
             const roi = costos > 0 ? (ganancia / costos) * 100 : 0;
 
-            // Actualizar barras de progreso
-            const progressBars = document.querySelectorAll('.progress-fill');
-            if (progressBars[0]) {
-                progressBars[0].style.width = `${Math.min(margenGanancia, 100)}%`;
-                const progressText = progressBars[0].parentElement.nextElementSibling;
-                if (progressText) {
-                    progressText.querySelector('span').textContent = `${margenGanancia.toFixed(1)}%`;
-                }
+            // Actualizar margen de ganancia
+            const margenProgress = document.getElementById('margenProgress');
+            const margenValue = document.getElementById('margenValue');
+            if (margenProgress && margenValue) {
+                margenProgress.style.width = `${Math.min(Math.max(margenGanancia, 0), 100)}%`;
+                margenValue.textContent = `${margenGanancia.toFixed(1)}%`;
             }
             
-            if (progressBars[1]) {
-                progressBars[1].style.width = `${Math.min(roi, 100)}%`;
-                const progressText = progressBars[1].parentElement.nextElementSibling;
-                if (progressText) {
-                    progressText.querySelector('span').textContent = `${roi.toFixed(1)}%`;
+            // Actualizar ROI
+            const roiProgress = document.getElementById('roiProgress');
+            const roiValue = document.getElementById('roiValue');
+            const roiDescription = document.getElementById('roiDescription');
+            if (roiProgress && roiValue && roiDescription) {
+                roiProgress.style.width = `${Math.min(Math.max(roi, 0), 100)}%`;
+                roiValue.textContent = `${roi.toFixed(1)}%`;
+                
+                // Descripción del ROI
+                if (roi > 100) {
+                    roiDescription.textContent = `Por cada peso invertido, obtienes $${(roi/100).toFixed(2)} en ganancia`;
+                } else if (roi > 50) {
+                    roiDescription.textContent = "Buen rendimiento";
+                } else if (roi > 0) {
+                    roiDescription.textContent = "Rendimiento moderado";
+                } else {
+                    roiDescription.textContent = "Sin ganancia";
                 }
             }
 
             // Actualizar resumen financiero
             actualizarResumenFinanciero(ventas, costos, ganancia);
+        }
+
+        // Función para calcular ticket promedio
+        function calcularTicketPromedio(pedidos, ventas) {
+            const ticketPromedio = pedidos.length > 0 ? ventas / pedidos.length : 0;
+            
+            const ticketProgress = document.getElementById('ticketProgress');
+            const ticketValue = document.getElementById('ticketValue');
+            
+            if (ticketProgress && ticketValue) {
+                // Usar un máximo de referencia para la barra de progreso (ej: $200,000)
+                const maxReferencia = 200000;
+                const porcentaje = Math.min((ticketPromedio / maxReferencia) * 100, 100);
+                
+                ticketProgress.style.width = `${porcentaje}%`;
+                ticketValue.textContent = `$${Math.round(ticketPromedio).toLocaleString()}`;
+            }
         }
 
         // Función para actualizar resumen financiero
@@ -823,14 +875,32 @@
         }
 
         // Función para mostrar error
-        function mostrarError() {
+        function mostrarError(errorMessage = 'Error desconocido') {
             const metricsContainer = document.querySelector('.metrics-container');
             if (metricsContainer) {
                 metricsContainer.innerHTML = `
                     <div class="text-center py-5">
                         <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
-                        <p class="text-muted">Error al cargar los datos de reportes</p>
+                        <h5 class="text-danger mb-3">Error al cargar los datos de reportes</h5>
+                        <p class="text-muted mb-3">Detalles: ${errorMessage}</p>
                         <button class="btn btn-primary" onclick="location.reload()">Reintentar</button>
+                        <button class="btn btn-outline-secondary ms-2" onclick="cargarDatosReportes()">Recargar Datos</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para mostrar mensaje cuando no hay datos
+        function mostrarMensajeVacio(tipo) {
+            const metricsContainer = document.querySelector('.metrics-container');
+            if (metricsContainer) {
+                metricsContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-info-circle text-info fa-3x mb-3"></i>
+                        <h5 class="text-info mb-3">No hay datos disponibles</h5>
+                        <p class="text-muted mb-3">No se encontraron ${tipo} en la base de datos.</p>
+                        <p class="text-muted mb-3">Asegúrate de haber agregado ${tipo} desde las otras secciones de la aplicación.</p>
+                        <button class="btn btn-primary" onclick="cargarDatosReportes()">Recargar Datos</button>
                     </div>
                 `;
             }
