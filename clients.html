@@ -545,18 +545,29 @@
                     const pedido = doc.data();
                     if (pedido.cliente && pedido.cliente.nombre) {
                         const clienteKey = pedido.cliente.nombre.toLowerCase();
+
+                        const total = parseFloat(pedido.resumen?.total) || 0;
+                        const anticipos = parseFloat(pedido.pago?.anticipos) || 0;
+                        const pagosRealizadosTotal = (pedido.pago?.pagosRealizados || []).reduce((sum, p) => sum + (parseFloat(p?.monto) || 0), 0);
+                        const saldoPendienteCalc = pedido.pago?.saldoPendiente;
+                        const saldoPendiente = typeof saldoPendienteCalc === 'number' ? saldoPendienteCalc : Math.max(0, total - anticipos - pagosRealizadosTotal);
+
                         if (!clientesMap.has(clienteKey)) {
                             clientesMap.set(clienteKey, {
                                 nombre: pedido.cliente.nombre,
                                 telefono: pedido.cliente.telefono || '',
                                 pedidos: 1,
                                 ultimoPedido: pedido.fechaCreacion?.toDate() || new Date(),
-                                totalGastado: pedido.resumen?.total || 0
+                                totalGastado: total,
+                                totalPagado: anticipos + pagosRealizadosTotal,
+                                totalDeuda: saldoPendiente
                             });
                         } else {
                             const cliente = clientesMap.get(clienteKey);
                             cliente.pedidos++;
-                            cliente.totalGastado += pedido.resumen?.total || 0;
+                            cliente.totalGastado += total;
+                            cliente.totalPagado = (cliente.totalPagado || 0) + (anticipos + pagosRealizadosTotal);
+                            cliente.totalDeuda = (cliente.totalDeuda || 0) + saldoPendiente;
                             if (pedido.fechaCreacion?.toDate() > cliente.ultimoPedido) {
                                 cliente.ultimoPedido = pedido.fechaCreacion.toDate();
                             }
@@ -605,6 +616,14 @@
                                         <div class="stat-item">
                                             <span class="stat-value">$${cliente.totalGastado.toLocaleString()}</span>
                                             <span class="stat-label">Total gastado</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value" style="color: var(--success-color)">$${(cliente.totalPagado || 0).toLocaleString()}</span>
+                                            <span class="stat-label">Total pagado</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value" style="color: ${((cliente.totalDeuda||0) > 0) ? 'var(--danger-color)' : 'var(--light-text)'}">$${(cliente.totalDeuda || 0).toLocaleString()}</span>
+                                            <span class="stat-label">${((cliente.totalDeuda||0) > 0) ? 'Deuda' : 'Sin deuda'}</span>
                                         </div>
                                     </div>
                                     <div class="client-actions d-flex gap-2 mt-2">
