@@ -109,6 +109,7 @@
         .metric-success { color: var(--success-color); }
         .metric-warning { color: var(--warning-color); }
         .metric-info { color: var(--info-color); }
+        .metric-danger { color: var(--danger-color); }
 
         .search-container {
             background: rgba(255, 255, 255, 0.95);
@@ -323,8 +324,8 @@
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="metric-card">
-                        <div class="metric-value metric-warning" id="clientesVIP">0</div>
-                        <div class="metric-label">Clientes VIP</div>
+                        <div class="metric-value metric-danger" id="totalDeudas">$0</div>
+                        <div class="metric-label">Total de Deudas</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
@@ -666,23 +667,23 @@
         function actualizarMetricasClientes(clientes) {
             const totalClientes = clientes.length;
             let totalGastado = 0;
-            let clientesVIP = 0;
+            let totalDeudas = 0;
 
             clientes.forEach(cliente => {
-                totalGastado += cliente.totalGastado;
-                // Considerar VIP si ha gastado más de $500,000 o tiene más de 5 pedidos
-                if (cliente.totalGastado > 500000 || cliente.pedidos > 5) {
-                    clientesVIP++;
-                }
+                totalGastado += cliente.totalGastado || 0;
+                totalDeudas += cliente.totalDeuda || 0;
             });
 
             const promedioCliente = totalClientes > 0 ? totalGastado / totalClientes : 0;
 
             // Actualizar elementos del DOM
             document.getElementById('totalClientes').textContent = totalClientes;
-            document.getElementById('clientesVIP').textContent = clientesVIP;
             document.getElementById('totalGastado').textContent = `$${totalGastado.toLocaleString()}`;
             document.getElementById('promedioCliente').textContent = `$${Math.round(promedioCliente).toLocaleString()}`;
+            const deudasEl = document.getElementById('totalDeudas');
+            if (deudasEl) {
+                deudasEl.textContent = `$${totalDeudas.toLocaleString()}`;
+            }
         }
 
         // Función para crear nuevo pedido con datos del cliente
