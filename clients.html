@@ -320,6 +320,7 @@
                     <div class="metric-card">
                         <div class="metric-value metric-primary" id="totalClientes">0</div>
                         <div class="metric-label">Total Clientes</div>
+                        <div class="text-muted small mt-1" id="clientesConDeuda">Total clientes con deuda: 0</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
@@ -670,11 +671,13 @@
             let totalGastado = 0;
             let totalDeudas = 0;
             let totalPagado = 0;
+            let clientesConDeuda = 0;
 
             clientes.forEach(cliente => {
                 totalGastado += cliente.totalGastado || 0;
                 totalDeudas += cliente.totalDeuda || 0;
                 totalPagado += cliente.totalPagado || 0;
+                if ((cliente.totalDeuda || 0) > 0) clientesConDeuda++;
             });
 
             // Actualizar elementos del DOM
@@ -691,6 +694,10 @@
             const pendienteEl = document.getElementById('pendienteGlobal');
             if (pendienteEl) {
                 pendienteEl.textContent = `Pendiente de pago: $${totalDeudas.toLocaleString()}`;
+            }
+            const clientesDeudaEl = document.getElementById('clientesConDeuda');
+            if (clientesDeudaEl) {
+                clientesDeudaEl.textContent = `Total clientes con deuda: ${clientesConDeuda}`;
             }
         }
 
