@@ -336,8 +336,9 @@
                 </div>
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="metric-card">
-                        <div class="metric-value metric-info" id="promedioCliente">$0</div>
-                        <div class="metric-label">Promedio por Cliente</div>
+                        <div class="metric-value metric-info" id="gananciasActuales">$0</div>
+                        <div class="metric-label">Ganancias actuales</div>
+                        <div class="text-muted small mt-1" id="pendienteGlobal">Pendiente de pago: $0</div>
                     </div>
                 </div>
             </div>
@@ -668,21 +669,28 @@
             const totalClientes = clientes.length;
             let totalGastado = 0;
             let totalDeudas = 0;
+            let totalPagado = 0;
 
             clientes.forEach(cliente => {
                 totalGastado += cliente.totalGastado || 0;
                 totalDeudas += cliente.totalDeuda || 0;
+                totalPagado += cliente.totalPagado || 0;
             });
-
-            const promedioCliente = totalClientes > 0 ? totalGastado / totalClientes : 0;
 
             // Actualizar elementos del DOM
             document.getElementById('totalClientes').textContent = totalClientes;
             document.getElementById('totalGastado').textContent = `$${totalGastado.toLocaleString()}`;
-            document.getElementById('promedioCliente').textContent = `$${Math.round(promedioCliente).toLocaleString()}`;
             const deudasEl = document.getElementById('totalDeudas');
             if (deudasEl) {
                 deudasEl.textContent = `$${totalDeudas.toLocaleString()}`;
+            }
+            const gananciasEl = document.getElementById('gananciasActuales');
+            if (gananciasEl) {
+                gananciasEl.textContent = `$${totalPagado.toLocaleString()}`;
+            }
+            const pendienteEl = document.getElementById('pendienteGlobal');
+            if (pendienteEl) {
+                pendienteEl.textContent = `Pendiente de pago: $${totalDeudas.toLocaleString()}`;
             }
         }
 
